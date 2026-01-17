@@ -48,11 +48,11 @@ input,select{flex:1;padding:8px;border-radius:5px;border:none}
 <script>
 /* ================== AUTH CHECK ================== */
 const userEmail = localStorage.getItem("user");
-if(!userEmail) window.location.href="login.html";
+if(!userEmail) window.location.href="index.html";
 
 function logout(){
   localStorage.removeItem("user");
-  window.location.href="login.html";
+  window.location.href="index.html";
 }
 
 /* ================== AUTO LOGOUT ================== */
@@ -297,3 +297,4 @@ parse();
 </script>
 </body>
 </html>
+
