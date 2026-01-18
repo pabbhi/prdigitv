@@ -45,6 +45,13 @@ async function loadLanguage(lang) {
     const text = await res.text();
     parseM3U(text);
 
+    if (channels.length > 0) {
+      // Auto-play first channel
+      play(channels[0]);
+    } else {
+      document.getElementById("nowPlaying").textContent = "No channels found";
+    }
+
   } catch (e) {
     alert("Failed to load channels");
     console.error(e);
@@ -162,4 +169,12 @@ function toggleFav(c) {
 
 function toggleFavorite() {
   if (current) toggleFav(current);
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    video.requestFullscreen().catch(err => console.log(err));
+  } else {
+    document.exitFullscreen();
+  }
 }
