@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IPTV Player</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    margin: 0;
+  }
+  .sidebar {
+    width: 30%;
+    border-right: 1px solid #ccc;
+    padding: 10px;
+    overflow-y: auto;
+  }
+  .player {
+    width: 70%;
+    padding: 10px;
+  }
+  input, button {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 5px;
+  }
+  .channel {
+    padding: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+  }
+  .channel:hover {
+    background: #f0f0f0;
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h3>Add M3U Playlist</h3>
+  <input id="playlistUrl" placeholder="https://example.com/playlist.m3u">
+  <button onclick="loadPlaylist()">Load Playlist</button>
+
+  <input id="search" placeholder="Search channel..." oninput="renderChannels()">
+
+  <h3>Channels</h3>
+  <div id="channels"></div>
+</div>
+
+<div class="player">
+  <h3 id="nowPlaying">Select a channel</h3>
+  <video id="video" controls autoplay width="100%" height="90%"></video>
+</div>
+
+<script>
+  const video = document.getElementById("video")
+  let hls
+  let channels = []
+
+  // Load saved data
+  const savedPlaylist = localStorage.getItem("playlistUrl")
+  const savedChannels = localStorage.getItem("channels")
+
+  if (savedChannels) {
+    channels = JSON.parse(savedChannels)
+    renderChannels()
+  }
+  if (savedPlaylist) {
+    document.getElementById("playlistUrl").value = savedPlaylist
+  }
+
+  function loadPlaylist() {
+    const url = document.getElementById("playlistUrl").value.trim()
+    if (!url) return alert("Enter M3U URL")
+
+    localStorage.setItem("playlistUrl", url)
+
+    fetch(url)
+      .then(res => res.text())
+      .then(parseM3U)
+      .catch(() => alert("Failed to load playlist (CORS issue)"))
+  }
+
+  function parseM3U(data) {
+    channels = []
+    let name = ""
+
+    data.split("\n").forEach(line => {
+      line = line.trim()
+      if (line.startsWith("#EXTINF")) {
+        name = line.split(",")[1]
+      } else if (line.startsWith("http")) {
+        channels.push({ name: name || "Unknown", url: line })
+        name = ""
+      }
+    })
+
+    localStorage.setItem("channels", JSON.stringify(channels))
+    renderChannels()
+  }
+
+  function renderChannels() {
+    const list = document.getElementById("channels")
+    const search = document.getElementById("search").value.toLowerCase()
+    list.innerHTML = ""
+
+    channels
+      .filter(c => c.name.toLowerCase().includes(search))
+      .forEach(c => {
+        const div = document.createElement("div")
+        div.className = "channel"
+        div.textContent = c.name
+        div.onclick = () => playStream(c.url, c.name)
+        list.appendChild(div)
+      })
+  }
+
+  function playStream(url, name) {
+    document.getElementById("nowPlaying").textContent = name
+
+    if (hls) hls.destroy()
+
+    if (Hls.isSupported()) {
+      hls = new Hls()
+      hls.loadSource(url)
+      hls.attachMedia(video)
+    } else {
+      video.src = url
+    }
+  }
+</script>
+
+</body>
+</html>
