@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Language Live TV Player</title>
+
+<!-- HLS.js -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<!-- Config -->
+<script src="config.js"></script>
+
+<!-- App logic -->
+<script src="app.js" defer></script>
+
+<style>
+:root {
+  --bg: #0f172a;
+  --panel: #111827;
+  --accent: #22c55e;
+  --text: #e5e7eb;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 5px;
+  background: var(--panel);
+  align-items: center;
+}
+
+.topbar .title {
+  font-weight: bold;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.topbar input, .topbar select {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  flex: 1;
+  min-width: 100px;
+}
+
+/* App layout */
+.app {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  height: calc(100vh - 50px); /* full viewport minus topbar */
+  overflow: hidden;
+}
+
+/* Player */
+.player {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: black;
+}
+
+.now {
+  padding: 8px;
+  font-weight: bold;
+  background: #111827;
+}
+
+video {
+  width: 100%;
+  height: auto;
+  max-height: 60vh;
+  background: black;
+  display: block;
+  flex-shrink: 0;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-around;
+  padding: 5px;
+  background: rgba(0,0,0,0.6);
+  flex-shrink: 0;
+}
+
+.controls button {
+  flex: 1;
+  margin: 0 3px;
+  padding: 6px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #1f2933;
+  color: var(--text);
+}
+
+/* Channels list */
+.channels {
+  flex: 1;
+  max-width: 350px;
+  background: var(--panel);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.channel {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #1f2933;
+  cursor: pointer;
+}
+
+.channel img {
+  width: 36px;
+  height: 36px;
+  margin-right: 10px;
+}
+
+.channel.active {
+  background: #1f2937;
+}
+
+.channel.flash {
+  animation: flashHighlight 0.6s ease;
+}
+
+.star {
+  margin-left: auto;
+  color: gold;
+}
+
+#channelCount {
+  padding: 5px 10px;
+  font-weight: bold;
+}
+
+/* Flash animation */
+@keyframes flashHighlight {
+  0%   { background-color: #22c55e; }
+  50%  { background-color: #1f2937; }
+  100% { background-color: #22c55e; }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+    height: calc(100vh - 50px);
+  }
+
+  .player {
+    flex: 0 0 auto;
+    min-height: 200px;
+  }
+
+  video {
+    height: 35vh;
+    max-height: 35vh;
+  }
+
+  .channels {
+    height: calc(65vh - 40px);
+    max-width: 100%;
+    overflow-y: auto;
+  }
+
+  .controls button {
+    font-size: 12px;
+    padding: 5px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="title">📺 Live TV Player</div>
+
+  <!-- Language selection -->
+  <select id="language" onchange="onLanguageChange()"></select>
+
+  <input id="search" placeholder="Search channel" oninput="renderChannels()">
+
+  <select id="category" onchange="onCategoryChange()">
+    <option value="">All</option>
+    <option value="FAV">⭐ Favorites</option>
+  </select>
+</div>
+
+<div class="app">
+  <div class="player">
+    <div class="now" id="nowPlaying">Select a channel</div>
+    <video id="video" controls playsinline muted></video>
+    <div class="controls">
+      <button onclick="togglePlay()">▶ / ⏸</button>
+      <button onclick="toggleMute()">🔊 / 🔇</button>
+      <button onclick="toggleFavorite()">⭐</button>
+      <button onclick="toggleFullscreen()">⛶</button>
+    </div>
+  </div>
+
+  <div class="channels">
+    <div id="channelCount">Channels: 0</div>
+    <div id="channels"></div>
+  </div>
+</div>
+
+<script>
+function toggleFullscreen(){
+  const video = document.getElementById('video');
+  if(!document.fullscreenElement){
+    video.requestFullscreen().catch(err => console.log(err));
+  } else {
+    document.exitFullscreen();
+  }
+}
+</script>
+
+</body>
+</html>
