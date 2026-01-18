@@ -10,11 +10,11 @@
   --bg:#0f172a; --panel:#111827; --accent:#22c55e; --text:#e5e7eb;
 }
 body{margin:0;font-family:system-ui,Arial;background:var(--bg);color:var(--text);}
-.app{display:flex;height:100vh;}
+.app{display:flex;height:100vh;flex-direction:row;}
 .sidebar{width:320px;background:var(--panel);display:flex;flex-direction:column;}
 .player{flex:1;display:flex;flex-direction:column;position:relative;background:black;}
 .now{padding:10px;font-weight:bold;background:#111827;color:#e5e7eb;position:absolute;top:0;width:100%;box-sizing:border-box;z-index:2;}
-video{width:100%;height:calc(100% - 50px - 40px);margin-top:40px;background:black;} /* 50px for controls, 40px for now bar */
+video{width:100%;height:calc(100% - 50px - 40px);margin-top:40px;background:black;}
 .controls{display:flex;justify-content:space-around;padding:8px;background:#020617;position:absolute;bottom:0;width:100%;box-sizing:border-box;z-index:2;}
 .controls button{flex:1;margin:0 5px;}
 input,select,button{padding:10px;margin:5px;border-radius:6px;border:none;font-size:14px;}
@@ -26,6 +26,7 @@ button.secondary{background:#334155;color:#fff;}
 .channel:hover{background:#1f2937;}
 .star{margin-left:auto;color:gold;}
 #channelCount{padding:5px 10px;font-weight:bold;}
+/* Mobile responsiveness */
 @media(max-width:768px){
   .app{flex-direction:column;}
   .sidebar{width:100%;height:45vh;}
@@ -36,7 +37,18 @@ button.secondary{background:#334155;color:#fff;}
 <body>
 <div class="app">
 
-  <!-- Sidebar -->
+  <!-- Player on left -->
+  <div class="player">
+    <div class="now" id="nowPlaying">Select a channel</div>
+    <video id="video" controls playsinline></video>
+    <div class="controls">
+      <button class="secondary" onclick="togglePlay()">▶ / ⏸</button>
+      <button class="secondary" onclick="toggleMute()">🔊 / 🔇</button>
+      <button onclick="toggleFavorite()">⭐</button>
+    </div>
+  </div>
+
+  <!-- Sidebar on right -->
   <div class="sidebar">
     <input id="playlistUrl" placeholder="Paste .m3u or public .m3u8 URL">
     <button onclick="loadURL()">Load URL</button>
@@ -48,17 +60,6 @@ button.secondary{background:#334155;color:#fff;}
     </select>
     <div id="channelCount">Channels: 0</div>
     <div class="channels" id="channels"></div>
-  </div>
-
-  <!-- Player -->
-  <div class="player">
-    <div class="now" id="nowPlaying">Select a channel</div>
-    <video id="video" controls playsinline></video>
-    <div class="controls">
-      <button class="secondary" onclick="togglePlay()">▶ / ⏸</button>
-      <button class="secondary" onclick="toggleMute()">🔊 / 🔇</button>
-      <button onclick="toggleFavorite()">⭐</button>
-    </div>
   </div>
 
 </div>
