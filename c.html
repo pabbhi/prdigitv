@@ -141,15 +141,37 @@ function renderChannels(){
   const q=document.getElementById("search").value.toLowerCase()
   const cat=document.getElementById("category").value
   list.innerHTML=""
+  
   channels.filter(c=>{
-    if(cat==="FAV") return favorites.includes(c.url)
-    if(cat && c.group!==cat) return false
-    return c.name.toLowerCase().includes(q)
+    // Search applies to all channels
+    if(q && !c.name.toLowerCase().includes(q)) return false
+
+    // Apply category filter only if not searching
+    if(!q){
+      if(cat==="FAV") return favorites.includes(c.url)
+      if(cat && c.group!==cat) return false
+    }
+
+    return true
   }).forEach(c=>{
     const div=document.createElement("div")
     div.className="channel"
-    div.innerHTML=`<img src="${c.logo||''}" onerror="this.style.display='none'">${c.name}${favorites.includes(c.url)?'<span class="star">★</span>':''}`
+    div.innerHTML=`
+      <img src="${c.logo||''}" onerror="this.style.display='none'">
+      ${c.name}
+      <span class="star" style="cursor:pointer;">${favorites.includes(c.url)?'★':'☆'}</span>
+    `
     div.onclick=()=>play(c)
+    
+    // Add favorite toggle for the star
+    div.querySelector(".star").onclick=(e)=>{
+      e.stopPropagation() // prevent playing the channel
+      const i=favorites.indexOf(c.url)
+      i>=0?favorites.splice(i,1):favorites.push(c.url)
+      localStorage.setItem("favorites",JSON.stringify(favorites))
+      renderChannels()
+    }
+
     list.appendChild(div)
   })
   updateChannelCount()
