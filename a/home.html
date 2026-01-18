@@ -40,6 +40,7 @@ body {
   padding: 5px;
   background: var(--panel);
   align-items: center;
+  flex-shrink: 0;
 }
 
 .topbar .title {
@@ -59,10 +60,10 @@ body {
 /* App layout */
 .app {
   display: flex;
-  flex-direction: row;
+  flex: 1;
   gap: 10px;
-  height: calc(100vh - 50px); /* full viewport minus topbar */
   overflow: hidden;
+  height: calc(100vh - 50px); /* full height minus topbar */
 }
 
 /* Player */
@@ -78,15 +79,14 @@ body {
   padding: 8px;
   font-weight: bold;
   background: #111827;
+  flex-shrink: 0;
 }
 
 video {
   width: 100%;
-  height: auto;
-  max-height: 60vh;
+  flex: 1;
+  object-fit: contain; /* video scales without cropping */
   background: black;
-  display: block;
-  flex-shrink: 0;
 }
 
 .controls {
@@ -231,6 +231,23 @@ function toggleFullscreen(){
     document.exitFullscreen();
   }
 }
+
+// Auto-resize video to fit screen on desktop and mobile
+function resizePlayer() {
+  const video = document.getElementById('video');
+  const player = document.querySelector('.player');
+  const topbarHeight = document.querySelector('.topbar').offsetHeight;
+  const controlsHeight = document.querySelector('.controls').offsetHeight;
+  const nowHeight = document.querySelector('.now').offsetHeight;
+  const windowHeight = window.innerHeight;
+
+  // Video height = windowHeight minus topbar, controls, nowPlaying
+  const newHeight = windowHeight - topbarHeight - controlsHeight - nowHeight - 20; // 20px gap
+  video.style.height = `${newHeight}px`;
+}
+
+window.addEventListener('resize', resizePlayer);
+window.addEventListener('DOMContentLoaded', resizePlayer);
 </script>
 
 </body>
