@@ -4,22 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Telugu Live TV Player</title>
-
-<!-- Favicon -->
-<link rel="icon" type="image/png" href="Logo.png">
-
-<!-- HLS.js -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0f0f0f;color:#fff;height:100vh;display:flex;flex-direction:column;}
+body{margin:0;font-family:Arial,sans-serif;background:#0f0f0f;color:#fff}
 header{background:#000;padding:10px;text-align:center;font-size:18px;font-weight:bold;display:flex;justify-content:space-between;align-items:center}
-header img{width:200px;height:100px;object-fit:contain}
-video{width:100%;background:#000;flex:1;object-fit:contain;display:block}
+video{width:100%;background:#000}
 .controls{display:flex;gap:6px;padding:8px}
 input,select{flex:1;padding:8px;border-radius:5px;border:none}
-.container{display:flex;flex-direction:column;flex:1;overflow:hidden}
-#channels{overflow-y:auto;scroll-behavior:smooth;padding-bottom:20px;flex:1}
+.container{display:flex;flex-direction:column}
+#channels{overflow-y:auto;max-height:70vh;scroll-behavior:smooth;padding-bottom:20px}
 .group{background:#222;padding:8px;font-weight:bold;cursor:pointer;user-select:none;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center}
 .group:hover{background:#333}
 .channel{padding:8px 12px;border-bottom:1px solid #333;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}
@@ -27,7 +20,7 @@ input,select{flex:1;padding:8px;border-radius:5px;border:none}
 .logo{width:40px;height:40px;border-radius:6px;object-fit:contain}
 .star{color:gold;font-size:18px;cursor:pointer}
 .collapsed .channel{display:none}
-@media(min-width:768px){.container{flex-direction:row}video{width:70%;height:100%;flex:1}#channels{width:30%;max-height:100%}}
+@media(min-width:768px){.container{flex-direction:row}video{width:70%;height:100vh}#channels{width:30%;max-height:100vh}}
 .logout{background:#c00;color:#fff;padding:5px 10px;border-radius:5px;border:none;cursor:pointer}
 .logout:hover{background:#900}
 </style>
@@ -35,7 +28,7 @@ input,select{flex:1;padding:8px;border-radius:5px;border:none}
 <body>
 
 <header>
-<img src="Logo.png" alt="PR DigiTV">
+<img src="Logo.png" alt="PR DigiTV" style="width:200px;height:100px">
 <button class="logout" onclick="logout()">Logout</button>
 </header>
 
@@ -85,7 +78,119 @@ let fav=JSON.parse(localStorage.getItem("fav_"+userEmail))||[];
 let defaultLogo="https://via.placeholder.com/40";
 
 /* ================== FULL M3U DATA ================== */
-const m3uData = `...`; // Keep your full M3U data here
+const m3uData = `#EXTM3U
+#################### ENTERTAINMENT ####################
+#EXTINF:-1 group-title="Entertainment",Gemini TV HD
+https://livestream10.sunnxt.com/DolbyVision/GeminiTV_HDR/GeminiTV_HDR_Endpoints/GeminiTV-HDR10-IN-index.m3u8
+#EXTINF:-1 group-title="Entertainment",ETV Telugu HD
+https://d2z3q47xzd535o.cloudfront.net/v1/master/9d43eacaed199f8d5883927e7aef514a8a08e108/ETV_HD_H264-2_cloud_in/index.m3u8
+#EXTINF:-1 group-title="Entertainment",Star Maa HD
+http://103.167.255.18:8085/play/a0nj/index.m3u8
+#EXTINF:-1 group-title="Entertainment",ETV Josh
+https://cc-uyh1ow5zouoio.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/ETV_Josh_IN/playlist.m3u8
+#EXTINF:-1 group-title="Entertainment",ETV Plus HD
+https://d27tnkf60df3v4.cloudfront.net/v1/master/9d43eacaed199f8d5883927e7aef514a8a08e108/ETV_PLUS_H264-3_cloud_in/index.m3u8
+#EXTINF:-1 group-title="Entertainment",Mahaa Max
+https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/mahaa-max/index.m3u8
+#EXTINF:-1 group-title="Entertainment",Telugu One
+https://amg02821-amg02821c1-samsung-in-4717.playouts.now.amagi.tv/playlist/amg02821-objectone-teluguone/playlist.m3u8
+#EXTINF:-1 group-title="Entertainment",Vanitha TV
+https://cdn-1.pishow.tv/live/393/master.m3u8
+#EXTINF:-1 group-title="Entertainment",Vissa TV
+http://103.140.254.2:3500/live/734.m3u8
+
+#################### MOVIES ####################
+#EXTINF:-1 group-title="Movies",&flix
+https://edge3-moblive.yuppcdn.net/drm/smil:nflixdrm.smil/index.m3u8
+#EXTINF:-1 group-title="Movies",ETV Cinema HD
+https://d1q7j6ha51ro6f.cloudfront.net/v1/master/9d43eacaed199f8d5883927e7aef514a8a08e108/ETV_CINEMA_H264-3_cloud_in/index.m3u8
+#EXTINF:-1 group-title="Movies",Gemini Movies
+http://103.167.255.18:8085/play/a0n5/index.m3u8
+#EXTINF:-1 group-title="Movies",Studio One +
+https://cdn-1.pishow.tv/live/276/master.m3u8
+#EXTINF:-1 group-title="Movies",Tolly TV
+https://streams2.sofast.tv/ptnr-yupptv/title-TOLLY-TV-TEL_yupptv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/manifest.m3u8
+#EXTINF:-1 group-title="Movies",Zee Cinemalu HD
+http://103.167.255.18:8085/play/a0ns/index.m3u8
+
+#################### KIDS ####################
+#EXTINF:-1 group-title="Kids",Disney Channel
+http://103.167.255.18:8085/play/a0kq/index.m3u8
+#EXTINF:-1 group-title="Kids",Disney Junior
+http://103.167.255.18:8085/play/a0k7/index.m3u8
+#EXTINF:-1 group-title="Kids",Gubbare
+https://epiconvh.akamaized.net/live/gubbare/master.m3u8
+#EXTINF:-1 group-title="Kids",Kushi TV
+http://103.140.254.2:3500/live/558.m3u8
+#EXTINF:-1 group-title="Kids",Nickelodeon
+http://103.178.78.151:7505/play/a0v1/index.m3u8
+#EXTINF:-1 group-title="Kids",Sonic
+http://103.167.255.18:8085/play/a0nf/index.m3u8
+#EXTINF:-1 group-title="Kids",Sony Yay!
+http://103.178.78.151:7505/play/a0ux/index.m3u8
+#EXTINF:-1 group-title="Kids",Super Hungama
+http://103.167.255.18:8085/play/a0lk/index.m3u8
+
+#################### NEWS ####################
+#EXTINF:-1 group-title="News",6 TV Telugu
+https://cdn-1.pishow.tv/live/232/master.m3u8
+#EXTINF:-1 group-title="News",10 TV
+https://cdn-1.pishow.tv/live/391/master.m3u8
+#EXTINF:-1 group-title="News",99TV
+https://cdn-1.pishow.tv/live/1211/master.m3u8
+#EXTINF:-1 group-title="News",ABN Andhra Jyoti
+https://cdn-1.pishow.tv/live/407/master.m3u8
+#EXTINF:-1 group-title="News",BIG TV
+https://cdn-1.pishow.tv/live/1059/master.m3u8
+#EXTINF:-1 group-title="News",BRK News
+https://cdn-1.pishow.tv/live/1037/master.m3u8
+#EXTINF:-1 group-title="News",ETV Andhra Pradesh
+https://d14vo2b97spizt.cloudfront.net/v1/master/9d43eacaed199f8d5883927e7aef514a8a08e108/ETV_AP_H264-3_cloud_in/index.m3u8
+#EXTINF:-1 group-title="News",ETV News
+https://cc-3448kp65yhc5w.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/ETV_News_IN/playlist.m3u8
+#EXTINF:-1 group-title="News",ETV Telangana
+https://dssp63pjfajz9.cloudfront.net/v1/master/9d43eacaed199f8d5883927e7aef514a8a08e108/ETV_TS_H264-3_cloud_in/index.m3u8
+#EXTINF:-1 group-title="News",HMTV
+https://cdn-1.pishow.tv/live/280/master.m3u8
+#EXTINF:-1 group-title="News",INews
+https://cdn-1.pishow.tv/live/411/master.m3u8
+#EXTINF:-1 group-title="News",Mahaa News
+https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/mahaa-news/index.m3u8
+#EXTINF:-1 group-title="News",NTV Telugu
+https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/ntv_nim_https/110322/ntv/playlist.m3u8
+#EXTINF:-1 group-title="News",Prime9 News
+https://mumbai-edge.smartplaytv.in/Prime9News/index.m3u8
+#EXTINF:-1 group-title="News",Sakshi TV
+https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/sakshi_nim_https/240122/sakshi/playlist.m3u8
+#EXTINF:-1 group-title="News",TV9 Telugu
+https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9telcmjhcs/liveabr/playlist.m3u8
+#EXTINF:-1 group-title="News",V6 News
+https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/v6news_nim_https/140622/v6news/playlist.m3u8
+#EXTINF:-1 group-title="News",Zee Telugu News
+https://d116gfrn8orazi.cloudfront.net/index.m3u8
+
+#################### MUSIC ####################
+#EXTINF:-1 group-title="Music",ETV Music
+https://cc-szivnms4rlah6.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/ETV_Music_IN/playlist.m3u8
+#EXTINF:-1 group-title="Music",Raj Musix Telugu
+https://cdn-1.pishow.tv/live/1213/master.m3u8
+
+#################### DOCUMENTARY ####################
+#EXTINF:-1 group-title="Documentary",National Geographic HD
+http://103.178.78.151:7505/play/a12o/index.m3u8
+#EXTINF:-1 group-title="Documentary",National Geographic Wild HD
+http://103.167.255.18:8085/play/a0lt/index.m3u8
+#EXTINF:-1 group-title="Documentary",Sony BBC Earth HD
+http://103.178.78.151:7505/play/a0vu/index.m3u8
+
+#################### RELIGIOUS ####################
+#EXTINF:-1 group-title="Religious",Aastha Telugu
+https://aasthaott.akamaized.net/110923/smil:aasthatelugu.smil/playlist.m3u8
+#EXTINF:-1 group-title="Religious",Bhakthi TV
+https://cdn-1.pishow.tv/live/397/master.m3u8
+#EXTINF:-1 group-title="Religious",SVBC
+https://player.mslivestream.net/telugu/5d076e5c3d34cb8bb08e54a4bb7e223e.sdp/playlist.m3u8
+`;
 
 /* ================== PARSE M3U ================== */
 function parse(){
@@ -173,12 +278,7 @@ function render(){
 
 /* ================== SEARCH/FILTER EVENTS ================== */
 search.addEventListener("input",render);
-
-// Clear search when category changes & render
-filter.addEventListener("change",()=>{
-  search.value="";
-  render();
-});
+filter.addEventListener("change",render);
 
 /* ================== AUTO NEXT IN CATEGORY ================== */
 video.addEventListener("ended",()=>{
