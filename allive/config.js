@@ -1,4 +1,3 @@
-// Language-wise M3U sources
 const LANGUAGE_M3U = {
   Hindi: "https://iptv-org.github.io/iptv/languages/hin.m3u",
   Telugu: "https://iptv-org.github.io/iptv/languages/tel.m3u",
@@ -17,5 +16,4 @@ const LANGUAGE_M3U = {
   Bhojpuri: "https://iptv-org.github.io/iptv/languages/bho.m3u"
 };
 
-// Default language
 const DEFAULT_LANGUAGE = "Telugu";
