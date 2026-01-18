@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responsive IPTV Player</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+:root {
+  --bg:#0f172a; --panel:#111827; --accent:#22c55e; --text:#e5e7eb;
+}
+body{margin:0;font-family:system-ui,Arial;background:var(--bg);color:var(--text);}
+.topbar{
+  display:flex; flex-wrap:wrap; gap:5px; padding:5px; background:var(--panel);
+}
+.topbar input, .topbar select, .topbar button{
+  padding:8px; border-radius:6px; border:none; font-size:14px;
+}
+.topbar input{flex:1;}
+.topbar select{flex:1; max-width:200px;}
+.topbar button{background:var(--accent); color:#000; font-weight:bold;}
+.app{display:flex; gap:10px; padding:5px; height:calc(100vh - 60px);}
+.player{flex:3; display:flex; flex-direction:column; background:black; position:relative;}
+.now{padding:10px;font-weight:bold;background:#111827;color:#e5e7eb;width:100%;box-sizing:border-box;}
+video{width:100%; height:100%; background:black;}
+.controls{display:flex;justify-content:space-around;padding:8px;background:#020617;width:100%;box-sizing:border-box;margin-top:5px;}
+.controls button{flex:1;margin:0 5px;}
+button.secondary{background:#334155;color:#fff;}
+.channels{flex:1; max-width:250px; background:var(--panel); overflow-y:auto; }
+.channel{display:flex;align-items:center;padding:10px;border-bottom:1px solid #1f2933;cursor:pointer;}
+.channel img{width:36px;height:36px;margin-right:10px;object-fit:contain;}
+.channel:hover{background:#1f2937;}
+.star{margin-left:auto;color:gold;}
+#channelCount{padding:5px 10px;font-weight:bold;}
+/* Mobile responsiveness */
+@media(max-width:768px){
+  .app{flex-direction:column;}
+  .player{flex:none; width:100%; height:250px;}
+  .channels{width:100%; max-width:100%; height:45vh;}
+  video{height:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <input id="playlistUrl" placeholder="Paste .m3u or public .m3u8 URL">
+  <button onclick="loadURL()">Load URL</button>
+  <input type="file" accept=".m3u,.m3u8" multiple onchange="loadFiles(event)">
+  <input id="search" placeholder="Search channel" oninput="renderChannels()">
+  <select id="category" onchange="onCategoryChange()">
+    <option value="">All Categories</option>
+    <option value="FAV">⭐ Favorites</option>
+  </select>
+</div>
+
+<div class="app">
+  <!-- Left Player -->
+  <div class="player">
+    <div class="now" id="nowPlaying">Select a channel</div>
+    <video id="video" controls playsinline></video>
+    <div class="controls">
+      <button class="secondary" onclick="togglePlay()">▶ / ⏸</button>
+      <button class="secondary" onclick="toggleMute()">🔊 / 🔇</button>
+      <button onclick="toggleFavorite()">⭐</button>
+    </div>
+  </div>
+
+  <!-- Right Channels -->
+  <div class="channels">
+    <div id="channelCount">Channels: 0</div>
+    <div id="channels"></div>
+  </div>
+</div>
+
+<script>
+const video=document.getElementById("video")
+const channelCountDiv=document.getElementById("channelCount")
+let hls
+let channels=[]
+let favorites=JSON.parse(localStorage.getItem("favorites"))||[]
+let current=null
+
+async function loadURL(){
+  const url=document.getElementById("playlistUrl").value.trim()
+  if(!url) return alert("Paste a valid URL")
+  if(url.endsWith(".m3u8")){
+    const channel={name:"My Channel",url,logo:"",group:"Single"}
+    channels.unshift(channel)
+    renderCategories(); renderChannels()
+    current=null
+    document.getElementById("nowPlaying").textContent = "Select a channel"
+  } else if(url.endsWith(".m3u")){
+    try {
+      const res = await fetch(url)
+      if(!res.ok) throw new Error("Failed to fetch M3U URL")
+      const text = await res.text()
+      parseM3U(text)
+    } catch(err){
+      alert("Failed to load M3U URL. Try downloading the file and upload it.")
+    }
+  } else alert("Invalid URL. Use .m3u8 or .m3u")
+}
+
+function loadFiles(e){
+  const files=e.target.files
+  if(!files.length) return
+  for(let file of files){
+    const reader=new FileReader()
+    reader.onload=()=>parseM3U(reader.result)
+    reader.readAsText(file)
+  }
+}
+
+function parseM3U(data){
+  let info={}
+  data.split("\n").forEach(line=>{
+    line=line.trim()
+    if(line.startsWith("#EXTINF")){
+      info={
+        name:line.split(",")[1]||"Unknown",
+        logo:(line.match(/tvg-logo="(.*?)"/)||[])[1],
+        group:(line.match(/group-title="(.*?)"/)||[])[1]||"Other"
+      }
+    } else if(line.startsWith("http")){
+      channels.push({...info,url:line})
+    }
+  })
+  renderCategories()
+  renderChannels()
+  current=null
+  document.getElementById("nowPlaying").textContent = "Select a channel"
+  updateChannelCount()
+}
+
+function renderCategories(){
+  const cat=document.getElementById("category")
+  const cats=[...new Set(channels.map(c=>c.group))]
+  cat.innerHTML=`<option value="">All</option><option value="FAV">⭐ Favorites</option>`
+  cats.forEach(c=>cat.innerHTML+=`<option>${c}</option>`)
+}
+
+function onCategoryChange(){
+  document.getElementById("search").value = "" // Clear search
+  renderChannels()
+}
+
+function renderChannels(){
+  const list=document.getElementById("channels")
+  const q=document.getElementById("search").value.toLowerCase()
+  const cat=document.getElementById("category").value
+  list.innerHTML=""
+  
+  channels.filter(c=>{
+    if(q && !c.name.toLowerCase().includes(q)) return false
+    if(!q){
+      if(cat==="FAV") return favorites.includes(c.url)
+      if(cat && c.group!==cat) return false
+    }
+    return true
+  }).forEach(c=>{
+    const div=document.createElement("div")
+    div.className="channel"
+    div.innerHTML=`
+      <img src="${c.logo||''}" onerror="this.style.display='none'">
+      ${c.name}
+      <span class="star" style="cursor:pointer;">${favorites.includes(c.url)?'★':'☆'}</span>
+    `
+    div.onclick=()=>play(c)
+    div.querySelector(".star").onclick=(e)=>{
+      e.stopPropagation()
+      const i=favorites.indexOf(c.url)
+      i>=0?favorites.splice(i,1):favorites.push(c.url)
+      localStorage.setItem("favorites",JSON.stringify(favorites))
+      renderChannels()
+    }
+    list.appendChild(div)
+  })
+  updateChannelCount()
+}
+
+function updateChannelCount(){
+  const cat=document.getElementById("category").value
+  let count=channels.length
+  if(cat==="FAV") count=channels.filter(c=>favorites.includes(c.url)).length
+  else if(cat) count=channels.filter(c=>c.group===cat).length
+  channelCountDiv.textContent=`Channels: ${count}`
+}
+
+function play(c){
+  current=c
+  document.getElementById("nowPlaying").textContent=c.name
+  if(hls) hls.destroy()
+  if(Hls.isSupported()){
+    hls=new Hls()
+    hls.loadSource(c.url)
+    hls.attachMedia(video)
+  } else {
+    video.src=c.url
+  }
+}
+
+function togglePlay(){ video.paused?video.play():video.pause() }
+function toggleMute(){ video.muted=!video.muted }
+function toggleFavorite(){
+  if(!current) return
+  const i=favorites.indexOf(current.url)
+  i>=0?favorites.splice(i,1):favorites.push(current.url)
+  localStorage.setItem("favorites",JSON.stringify(favorites))
+  renderChannels()
+}
+</script>
+</body>
+</html>
