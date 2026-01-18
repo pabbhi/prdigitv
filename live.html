@@ -196,16 +196,22 @@ function updateChannelCount(){
   channelCountDiv.textContent=`Channels: ${count}`
 }
 
+// PLAY function with autoplay on user click
 function play(c){
   current=c
   document.getElementById("nowPlaying").textContent=c.name
   if(hls) hls.destroy()
+
   if(Hls.isSupported()){
     hls=new Hls()
     hls.loadSource(c.url)
     hls.attachMedia(video)
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      video.play().catch(()=>{}) // autoplay after Hls is ready
+    })
   } else {
     video.src=c.url
+    video.play().catch(()=>{}) // autoplay for browsers that support direct .m3u8
   }
 }
 
