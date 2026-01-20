@@ -1,25 +1,23 @@
-// ------------------- IPTV M3U LINKS -------------------
+// config.js
+const PROXY = "https://prdigitv-ts-proxy.onrender.com/"; // Your TS proxy
+
 const LANGUAGE_M3U = {
-  Telugu2: "https://pabbhi.github.io/prdigitv/stb/final.m3u",
-  Hindi: "https://iptv-org.github.io/iptv/languages/hin.m3u",
-  Telugu: "https://iptv-org.github.io/iptv/languages/tel.m3u",
-  Tamil: "https://iptv-org.github.io/iptv/languages/tam.m3u",
-  Kannada: "https://iptv-org.github.io/iptv/languages/kan.m3u",
-  Marathi: "https://iptv-org.github.io/iptv/languages/mar.m3u",
-  Bengali: "https://iptv-org.github.io/iptv/languages/ben.m3u",
-  Punjabi: "https://iptv-org.github.io/iptv/languages/pan.m3u",
-  Malayalam: "https://iptv-org.github.io/iptv/languages/mal.m3u",
-  Urdu: "https://iptv-org.github.io/iptv/languages/urd.m3u",
-  Gujarathi: "https://iptv-org.github.io/iptv/languages/guj.m3u",
-  Odisha: "https://iptv-org.github.io/iptv/languages/ori.m3u",
-  "Unknown SIN": "https://iptv-org.github.io/iptv/languages/sin.m3u",
-  Assamese: "https://iptv-org.github.io/iptv/languages/asm.m3u",
-  Konkani: "https://iptv-org.github.io/iptv/languages/kok.m3u",
-  Bhojpuri: "https://iptv-org.github.io/iptv/languages/bho.m3u"
+  Telugu2: PROXY + "https://pabbhi.github.io/prdigitv/stb/final.m3u",
+  Hindi: PROXY + "https://iptv-org.github.io/iptv/languages/hin.m3u",
+  Telugu: PROXY + "https://iptv-org.github.io/iptv/languages/tel.m3u",
+  Tamil: PROXY + "https://iptv-org.github.io/iptv/languages/tam.m3u",
+  Kannada: PROXY + "https://iptv-org.github.io/iptv/languages/kan.m3u",
+  Marathi: PROXY + "https://iptv-org.github.io/iptv/languages/mar.m3u",
+  Bengali: PROXY + "https://iptv-org.github.io/iptv/languages/ben.m3u",
+  Punjabi: PROXY + "https://iptv-org.github.io/iptv/languages/pan.m3u",
+  Malayalam: PROXY + "https://iptv-org.github.io/iptv/languages/mal.m3u",
+  Urdu: PROXY + "https://iptv-org.github.io/iptv/languages/urd.m3u",
+  Gujarathi: PROXY + "https://iptv-org.github.io/iptv/languages/guj.m3u",
+  Odisha: PROXY + "https://iptv-org.github.io/iptv/languages/ori.m3u",
+  "Unknown SIN": PROXY + "https://iptv-org.github.io/iptv/languages/sin.m3u",
+  Assamese: PROXY + "https://iptv-org.github.io/iptv/languages/asm.m3u",
+  Konkani: PROXY + "https://iptv-org.github.io/iptv/languages/kok.m3u",
+  Bhojpuri: PROXY + "https://iptv-org.github.io/iptv/languages/bho.m3u"
 };
 
-// Default language
 const DEFAULT_LANGUAGE = "Telugu2";
-
-// TS → HLS Proxy (Render)
-const TS_TO_HLS = "https://prdigitv-ts-proxy.onrender.com/hls?url=";
