@@ -1,24 +1,23 @@
 const video = document.getElementById("video");
 const channelCountDiv = document.getElementById("channelCount");
 
-let hls = null;
+let hls;
 let channels = [];
 let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 let current = null;
 
 let currentLanguage = localStorage.getItem("language") || DEFAULT_LANGUAGE;
 
-// ---------------- INIT ----------------
+// ------------------- INITIALIZE -------------------
 window.addEventListener("DOMContentLoaded", () => {
   initLanguages();
   loadLanguage(currentLanguage);
 });
 
-// ---------------- LANGUAGE ----------------
+// ------------------- LANGUAGE HANDLING -------------------
 function initLanguages() {
   const langSelect = document.getElementById("language");
   langSelect.innerHTML = "";
-
   Object.keys(LANGUAGE_M3U).forEach(lang => {
     const opt = document.createElement("option");
     opt.value = lang;
@@ -29,30 +28,35 @@ function initLanguages() {
 }
 
 function onLanguageChange() {
-  currentLanguage = document.getElementById("language").value;
-  localStorage.setItem("language", currentLanguage);
-  loadLanguage(currentLanguage);
+  const lang = document.getElementById("language").value;
+  currentLanguage = lang;
+  localStorage.setItem("language", lang);
+  loadLanguage(lang);
 }
 
-// ---------------- LOAD M3U ----------------
 async function loadLanguage(lang) {
-  channels = [];
-  renderChannels();
-  renderCategories();
-  document.getElementById("nowPlaying").textContent = "Loading channels...";
-
   try {
+    channels = [];
+    renderChannels();
+    renderCategories();
+    document.getElementById("nowPlaying").textContent = `Loading ${lang} channels...`;
+
     const res = await fetch(LANGUAGE_M3U[lang]);
     const text = await res.text();
     parseM3U(text);
 
-    if (channels.length) play(channels[0]);
+    if (channels.length > 0) {
+      play(channels[0]); // auto-play first channel
+    } else {
+      document.getElementById("nowPlaying").textContent = "No channels found";
+    }
   } catch (e) {
+    alert("Failed to load channels");
     console.error(e);
-    document.getElementById("nowPlaying").textContent = "Failed to load M3U";
   }
 }
 
+// ------------------- M3U PARSING -------------------
 function parseM3U(data) {
   let info = {};
   channels = [];
@@ -74,18 +78,12 @@ function parseM3U(data) {
   renderChannels();
 }
 
-// ---------------- CATEGORIES ----------------
+// ------------------- CATEGORIES -------------------
 function renderCategories() {
   const cat = document.getElementById("category");
   const groups = [...new Set(channels.map(c => c.group))];
-
   cat.innerHTML = `<option value="">All</option><option value="FAV">⭐ Favorites</option>`;
-  groups.forEach(g => {
-    const o = document.createElement("option");
-    o.value = g;
-    o.textContent = g;
-    cat.appendChild(o);
-  });
+  groups.forEach(g => cat.innerHTML += `<option>${g}</option>`);
 }
 
 function onCategoryChange() {
@@ -93,44 +91,41 @@ function onCategoryChange() {
   renderChannels();
 }
 
-// ---------------- RENDER ----------------
+// ------------------- RENDER CHANNELS -------------------
 function renderChannels() {
   const list = document.getElementById("channels");
   const q = document.getElementById("search").value.toLowerCase();
   const cat = document.getElementById("category").value;
-
   list.innerHTML = "";
 
   const filtered = channels.filter(c => {
     if (q && !c.name.toLowerCase().includes(q)) return false;
     if (cat === "FAV") return favorites.includes(c.url);
-    if (cat && cat !== "FAV" && c.group !== cat) return false;
+    if (cat && c.group !== cat) return false;
     return true;
   });
 
   filtered.forEach(c => {
     const div = document.createElement("div");
-    div.className = "channel" + (current?.url === c.url ? " active" : "");
-
+    div.className = "channel";
+    if (current?.url === c.url) div.classList.add("active");
     div.innerHTML = `
-      <img src="${c.logo || ""}" onerror="this.style.display='none'">
+      <img src="${c.logo || ''}" onerror="this.style.display='none'">
       ${c.name}
       <span class="star">${favorites.includes(c.url) ? "★" : "☆"}</span>
     `;
-
     div.onclick = () => play(c);
     div.querySelector(".star").onclick = e => {
       e.stopPropagation();
       toggleFav(c);
     };
-
     list.appendChild(div);
   });
 
   channelCountDiv.textContent = `Channels: ${filtered.length}`;
 }
 
-// ---------------- PLAYBACK (TS + HLS) ----------------
+// ------------------- PLAYBACK -------------------
 function play(c) {
   current = c;
   document.getElementById("nowPlaying").textContent = c.name;
@@ -143,23 +138,19 @@ function play(c) {
   video.pause();
   video.src = "";
 
-  const url = c.url;
+  let url = c.url;
 
-  // 🔥 TS via Render proxy
+  // TS → HLS Proxy
   if (url.toLowerCase().includes(".ts")) {
-    video.src = TS_PROXY + encodeURIComponent(url);
-    video.play().catch(console.error);
-    renderChannels();
-    return;
+    url = TS_TO_HLS + encodeURIComponent(url);
   }
 
-  // HLS (.m3u8)
   if (Hls.isSupported()) {
-    hls = new Hls();
+    hls = new Hls({ lowLatencyMode: true });
     hls.loadSource(url);
     hls.attachMedia(video);
     hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-  } else {
+  } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
     video.src = url;
     video.play();
   }
@@ -167,23 +158,23 @@ function play(c) {
   renderChannels();
 }
 
-// ---------------- CONTROLS ----------------
-function togglePlay() {
-  video.paused ? video.play() : video.pause();
-}
-function toggleMute() {
-  video.muted = !video.muted;
-}
+// ------------------- CONTROLS -------------------
+function togglePlay() { video.paused ? video.play() : video.pause(); }
+function toggleMute() { video.muted = !video.muted; }
+
 function toggleFav(c) {
   const i = favorites.indexOf(c.url);
   i >= 0 ? favorites.splice(i, 1) : favorites.push(c.url);
   localStorage.setItem("favorites", JSON.stringify(favorites));
   renderChannels();
 }
-function toggleFavorite() {
-  if (current) toggleFav(current);
-}
+
+function toggleFavorite() { if (current) toggleFav(current); }
+
 function toggleFullscreen() {
-  if (!document.fullscreenElement) video.requestFullscreen();
-  else document.exitFullscreen();
+  if (!document.fullscreenElement) {
+    video.requestFullscreen().catch(err => console.log(err));
+  } else {
+    document.exitFullscreen();
+  }
 }
