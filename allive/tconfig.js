@@ -1,3 +1,4 @@
+// ------------------- IPTV M3U LINKS -------------------
 const LANGUAGE_M3U = {
   Telugu2: "https://pabbhi.github.io/prdigitv/stb/final.m3u",
   Hindi: "https://iptv-org.github.io/iptv/languages/hin.m3u",
@@ -17,7 +18,8 @@ const LANGUAGE_M3U = {
   Bhojpuri: "https://iptv-org.github.io/iptv/languages/bho.m3u"
 };
 
+// Default language
 const DEFAULT_LANGUAGE = "Telugu2";
 
-// 🔥 Render TS proxy
-const TS_PROXY = "https://prdigitv-ts-proxy.onrender.com/stream?url=";
+// TS → HLS Proxy (Render)
+const TS_TO_HLS = "https://prdigitv-ts-proxy.onrender.com/hls?url=";
