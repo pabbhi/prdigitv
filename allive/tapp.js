@@ -1,3 +1,4 @@
+// app.js
 const video = document.getElementById("video");
 const channelCountDiv = document.getElementById("channelCount");
 
@@ -8,13 +9,13 @@ let current = null;
 
 let currentLanguage = localStorage.getItem("language") || DEFAULT_LANGUAGE;
 
-// ------------------- INITIALIZE -------------------
+// Initialize
 window.addEventListener("DOMContentLoaded", () => {
   initLanguages();
   loadLanguage(currentLanguage);
 });
 
-// ------------------- LANGUAGE HANDLING -------------------
+// ---------------- Language Handling ----------------
 function initLanguages() {
   const langSelect = document.getElementById("language");
   langSelect.innerHTML = "";
@@ -34,6 +35,7 @@ function onLanguageChange() {
   loadLanguage(lang);
 }
 
+// ---------------- Load Channels ----------------
 async function loadLanguage(lang) {
   try {
     channels = [];
@@ -45,18 +47,16 @@ async function loadLanguage(lang) {
     const text = await res.text();
     parseM3U(text);
 
-    if (channels.length > 0) {
-      play(channels[0]); // auto-play first channel
-    } else {
-      document.getElementById("nowPlaying").textContent = "No channels found";
-    }
+    if (channels.length > 0) play(channels[0]);
+    else document.getElementById("nowPlaying").textContent = "No channels found";
+
   } catch (e) {
     alert("Failed to load channels");
     console.error(e);
   }
 }
 
-// ------------------- M3U PARSING -------------------
+// ---------------- Parse M3U ----------------
 function parseM3U(data) {
   let info = {};
   channels = [];
@@ -70,7 +70,8 @@ function parseM3U(data) {
         group: (line.match(/group-title="(.*?)"/) || [])[1] || "Other"
       };
     } else if (line.startsWith("http")) {
-      channels.push({ ...info, url: line });
+      // Use proxy for each stream URL
+      channels.push({ ...info, url: PROXY + line });
     }
   });
 
@@ -78,7 +79,7 @@ function parseM3U(data) {
   renderChannels();
 }
 
-// ------------------- CATEGORIES -------------------
+// ---------------- Categories ----------------
 function renderCategories() {
   const cat = document.getElementById("category");
   const groups = [...new Set(channels.map(c => c.group))];
@@ -91,7 +92,7 @@ function onCategoryChange() {
   renderChannels();
 }
 
-// ------------------- RENDER CHANNELS -------------------
+// ---------------- Render Channels ----------------
 function renderChannels() {
   const list = document.getElementById("channels");
   const q = document.getElementById("search").value.toLowerCase();
@@ -114,51 +115,43 @@ function renderChannels() {
       ${c.name}
       <span class="star">${favorites.includes(c.url) ? "★" : "☆"}</span>
     `;
+
     div.onclick = () => play(c);
     div.querySelector(".star").onclick = e => {
       e.stopPropagation();
       toggleFav(c);
     };
+
     list.appendChild(div);
   });
 
   channelCountDiv.textContent = `Channels: ${filtered.length}`;
 }
 
-// ------------------- PLAYBACK -------------------
+// ---------------- Playback ----------------
 function play(c) {
   current = c;
   document.getElementById("nowPlaying").textContent = c.name;
 
-  if (hls) {
-    hls.destroy();
-    hls = null;
-  }
+  if (hls) { hls.destroy(); hls = null; }
 
   video.pause();
   video.src = "";
 
-  let url = c.url;
-
-  // TS → HLS Proxy
-  if (url.toLowerCase().includes(".ts")) {
-    url = TS_TO_HLS + encodeURIComponent(url);
-  }
-
   if (Hls.isSupported()) {
     hls = new Hls({ lowLatencyMode: true });
-    hls.loadSource(url);
+    hls.loadSource(c.url);
     hls.attachMedia(video);
     hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
   } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-    video.src = url;
+    video.src = c.url;
     video.play();
   }
 
   renderChannels();
 }
 
-// ------------------- CONTROLS -------------------
+// ---------------- Controls ----------------
 function togglePlay() { video.paused ? video.play() : video.pause(); }
 function toggleMute() { video.muted = !video.muted; }
 
@@ -170,11 +163,7 @@ function toggleFav(c) {
 }
 
 function toggleFavorite() { if (current) toggleFav(current); }
-
 function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    video.requestFullscreen().catch(err => console.log(err));
-  } else {
-    document.exitFullscreen();
-  }
+  if (!document.fullscreenElement) video.requestFullscreen().catch(err => console.log(err));
+  else document.exitFullscreen();
 }
