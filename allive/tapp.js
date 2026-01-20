@@ -5,15 +5,16 @@ let hls;
 let channels = [];
 let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 let current = null;
+
 let currentLanguage = localStorage.getItem("language") || DEFAULT_LANGUAGE;
 
-// -------------------- INIT --------------------
+// Initialize
 window.addEventListener("DOMContentLoaded", () => {
   initLanguages();
   loadLanguage(currentLanguage);
 });
 
-// ------------------- LANGUAGE -------------------
+// ------------------- Language Handling -------------------
 function initLanguages() {
   const langSelect = document.getElementById("language");
   langSelect.innerHTML = "";
@@ -49,14 +50,13 @@ async function loadLanguage(lang) {
     } else {
       document.getElementById("nowPlaying").textContent = "No channels found";
     }
-
   } catch (e) {
     alert("Failed to load channels");
     console.error(e);
   }
 }
 
-// ------------------- M3U PARSE -------------------
+// ------------------- M3U Parsing -------------------
 function parseM3U(data) {
   let info = {};
   channels = [];
@@ -72,9 +72,7 @@ function parseM3U(data) {
         group: (line.match(/group-title="(.*?)"/) || [])[1] || "Other"
       };
     } else if (line.startsWith("http")) {
-      // Wrap .ts in .m3u8 dynamically if needed
-      const url = line.endsWith(".m3u8") ? line : createM3U8FromTS(line);
-      channels.push({ ...info, url, rawUrl: line });
+      channels.push({ ...info, url: line });
     }
   });
 
@@ -82,18 +80,7 @@ function parseM3U(data) {
   renderChannels();
 }
 
-// ------------------- CREATE TEMP M3U8 FOR .TS -------------------
-function createM3U8FromTS(tsUrl) {
-  // HLS.js can accept data URI with a small playlist
-  const playlist = `#EXTM3U
-#EXTINF:-1,TS Stream
-${tsUrl}
-`;
-  const blob = new Blob([playlist], { type: "application/vnd.apple.mpegurl" });
-  return URL.createObjectURL(blob);
-}
-
-// ------------------- CATEGORIES -------------------
+// ------------------- Categories -------------------
 function renderCategories() {
   const cat = document.getElementById("category");
   const groups = [...new Set(channels.map(c => c.group))];
@@ -106,7 +93,7 @@ function onCategoryChange() {
   renderChannels();
 }
 
-// ------------------- CHANNEL LIST -------------------
+// ------------------- Render Channels -------------------
 function renderChannels() {
   const list = document.getElementById("channels");
   const q = document.getElementById("search").value.toLowerCase();
@@ -115,7 +102,7 @@ function renderChannels() {
 
   const filtered = channels.filter(c => {
     if (q && !c.name.toLowerCase().includes(q)) return false;
-    if (cat === "FAV") return favorites.includes(c.rawUrl || c.url);
+    if (cat === "FAV") return favorites.includes(c.url);
     if (cat && c.group !== cat) return false;
     return true;
   });
@@ -123,12 +110,13 @@ function renderChannels() {
   filtered.forEach(c => {
     const div = document.createElement("div");
     div.className = "channel";
-    if (current?.rawUrl === c.rawUrl) div.classList.add("active");
+    if (current?.url === c.url) div.classList.add("active");
     div.innerHTML = `
       <img src="${c.logo || ''}" onerror="this.style.display='none'">
       ${c.name}
-      <span class="star">${favorites.includes(c.rawUrl || c.url) ? "★" : "☆"}</span>
+      <span class="star">${favorites.includes(c.url) ? "★" : "☆"}</span>
     `;
+
     div.onclick = () => play(c);
     div.querySelector(".star").onclick = e => {
       e.stopPropagation();
@@ -141,7 +129,7 @@ function renderChannels() {
   channelCountDiv.textContent = `Channels: ${filtered.length}`;
 }
 
-// ------------------- PLAYBACK -------------------
+// ------------------- Playback -------------------
 function play(c) {
   current = c;
   document.getElementById("nowPlaying").textContent = c.name;
@@ -154,31 +142,39 @@ function play(c) {
   video.pause();
   video.src = "";
 
-  if (Hls.isSupported()) {
-    hls = new Hls({ lowLatencyMode: true, enableWorker: true, debug: true });
-    hls.loadSource(c.url);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      video.play().catch(err => console.log("Autoplay failed", err));
-    });
-    hls.on(Hls.Events.ERROR, (event, data) => console.error("HLS.js error", data));
-  } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-    video.src = c.url;
-    video.play().catch(err => console.log(err));
-  } else {
-    console.error("Cannot play this stream:", c.url);
+  // --- Handle .ts playback ---
+  let url = c.url;
+  if (url.endsWith(".ts")) {
+    // Wrap TS in a temporary m3u8
+    const m3u8Content = `#EXTM3U
+#EXTINF:-1,
+${CORS_PROXY + encodeURIComponent(url)}
+`;
+    const blob = new Blob([m3u8Content], { type: "application/vnd.apple.mpegurl" });
+    url = URL.createObjectURL(blob);
   }
 
-  renderChannels();
+  // HLS.js playback
+  if (Hls.isSupported()) {
+    hls = new Hls({ lowLatencyMode: true });
+    hls.loadSource(url);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+  } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    video.src = url;
+    video.play();
+  }
+
+  renderChannels(); // highlight active
 }
 
-// ------------------- CONTROLS -------------------
+// ------------------- Controls -------------------
 function togglePlay() { video.paused ? video.play() : video.pause(); }
 function toggleMute() { video.muted = !video.muted; }
 
 function toggleFav(c) {
-  const i = favorites.indexOf(c.rawUrl || c.url);
-  i >= 0 ? favorites.splice(i, 1) : favorites.push(c.rawUrl || c.url);
+  const i = favorites.indexOf(c.url);
+  i >= 0 ? favorites.splice(i, 1) : favorites.push(c.url);
   localStorage.setItem("favorites", JSON.stringify(favorites));
   renderChannels();
 }
