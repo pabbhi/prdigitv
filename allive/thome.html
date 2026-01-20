@@ -5,8 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PR DigiTV</title>
 
+<!-- HLS.js -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<!-- Config -->
 <script src="tconfig.js"></script>
+
+<!-- App logic -->
 <script src="tapp.js" defer></script>
 
 <style>
@@ -16,40 +21,103 @@
   --text: #e5e7eb;
 }
 
-body { margin:0; font-family:system-ui,Arial; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; }
+body {
+  margin: 0;
+  font-family: system-ui, Arial;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-.topbar { display:flex; flex-wrap:wrap; gap:5px; padding:5px; background:var(--panel); align-items:center; flex-shrink:0; }
-.topbar .title { font-weight:bold; font-size:18px; white-space:nowrap; }
-.topbar input, .topbar select { padding:8px; border-radius:6px; border:none; flex:1; min-width:100px; }
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 5px;
+  background: var(--panel);
+}
 
-.app { display:flex; flex:1; gap:10px; overflow:hidden; height:calc(100vh - 50px); }
-.player { flex:3; display:flex; flex-direction:column; min-height:0; background:black; }
-.now { padding:8px; font-weight:bold; background:#111827; flex-shrink:0; }
-video { width:100%; flex:1; object-fit:contain; background:black; }
-.controls { display:flex; justify-content:space-around; padding:5px; background:rgba(0,0,0,0.6); flex-shrink:0; }
-.controls button { flex:1; margin:0 3px; padding:6px; font-size:14px; border:none; border-radius:4px; cursor:pointer; background:#1f2933; color:var(--text); }
-.channels { flex:1; max-width:350px; background:var(--panel); overflow-y:auto; min-height:0; }
-.channel { display:flex; align-items:center; padding:10px; border-bottom:1px solid #1f2933; cursor:pointer; }
-.channel img { width:36px; height:36px; margin-right:10px; }
-.channel.active { background:#1f2937; }
-.star { margin-left:auto; color:gold; }
-#channelCount { padding:5px 10px; font-weight:bold; }
+.app {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
 
-@media (max-width:768px) {
-  .app { flex-direction:column; height:calc(100vh - 50px); }
-  .player { flex:0 0 auto; min-height:200px; }
-  video { height:35vh; max-height:35vh; }
-  .channels { height:calc(65vh - 40px); max-width:100%; overflow-y:auto; }
-  .controls button { font-size:12px; padding:5px; }
+.player {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  background: black;
+}
+
+.now {
+  padding: 8px;
+  background: #111827;
+  font-weight: bold;
+}
+
+video {
+  width: 100%;
+  flex: 1;
+  background: black;
+}
+
+.controls {
+  display: flex;
+  padding: 5px;
+  background: rgba(0,0,0,.6);
+}
+
+.controls button {
+  flex: 1;
+  margin: 0 3px;
+  padding: 6px;
+  background: #1f2933;
+  color: var(--text);
+  border: none;
+  border-radius: 4px;
+}
+
+.channels {
+  flex: 1;
+  max-width: 350px;
+  background: var(--panel);
+  overflow-y: auto;
+}
+
+.channel {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #1f2933;
+  cursor: pointer;
+}
+
+.channel.active {
+  background: #1f2937;
+}
+
+.channel img {
+  width: 36px;
+  height: 36px;
+  margin-right: 10px;
+}
+
+.star {
+  margin-left: auto;
+  color: gold;
 }
 </style>
 </head>
 
 <body>
+
 <div class="topbar">
-  <div class="title">📺 Live TV Player</div>
+  <b>📺 PR DigiTV</b>
   <select id="language" onchange="onLanguageChange()"></select>
-  <input id="search" placeholder="Search channel" oninput="renderChannels()">
+  <input id="search" placeholder="Search" oninput="renderChannels()">
   <select id="category" onchange="onCategoryChange()">
     <option value="">All</option>
     <option value="FAV">⭐ Favorites</option>
@@ -69,9 +137,10 @@ video { width:100%; flex:1; object-fit:contain; background:black; }
   </div>
 
   <div class="channels">
-    <div id="channelCount">Channels: 0</div>
+    <div id="channelCount" style="padding:5px"></div>
     <div id="channels"></div>
   </div>
 </div>
+
 </body>
 </html>
