@@ -18,3 +18,6 @@ const LANGUAGE_M3U = {
 };
 
 const DEFAULT_LANGUAGE = "Telugu2";
+
+
+const CORS_PROXY = "https://corsproxy.io/?";
