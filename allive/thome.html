@@ -5,194 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PR DigiTV</title>
 
-<!-- HLS.js -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
-<!-- Config -->
-<script src="config.js"></script>
-
-<!-- App logic -->
-<script src="app.js" defer></script>
+<script src="tconfig.js"></script>
+<script src="tapp.js" defer></script>
 
 <style>
 :root {
   --bg: #0f172a;
   --panel: #111827;
-  --accent: #22c55e;
   --text: #e5e7eb;
 }
 
-body {
-  margin: 0;
-  font-family: system-ui, Arial;
-  background: var(--bg);
-  color: var(--text);
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+body { margin:0; font-family:system-ui,Arial; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column; }
 
-/* Topbar */
-.topbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  padding: 5px;
-  background: var(--panel);
-  align-items: center;
-  flex-shrink: 0;
-}
+.topbar { display:flex; flex-wrap:wrap; gap:5px; padding:5px; background:var(--panel); align-items:center; flex-shrink:0; }
+.topbar .title { font-weight:bold; font-size:18px; white-space:nowrap; }
+.topbar input, .topbar select { padding:8px; border-radius:6px; border:none; flex:1; min-width:100px; }
 
-.topbar .title {
-  font-weight: bold;
-  font-size: 18px;
-  white-space: nowrap;
-}
+.app { display:flex; flex:1; gap:10px; overflow:hidden; height:calc(100vh - 50px); }
+.player { flex:3; display:flex; flex-direction:column; min-height:0; background:black; }
+.now { padding:8px; font-weight:bold; background:#111827; flex-shrink:0; }
+video { width:100%; flex:1; object-fit:contain; background:black; }
+.controls { display:flex; justify-content:space-around; padding:5px; background:rgba(0,0,0,0.6); flex-shrink:0; }
+.controls button { flex:1; margin:0 3px; padding:6px; font-size:14px; border:none; border-radius:4px; cursor:pointer; background:#1f2933; color:var(--text); }
+.channels { flex:1; max-width:350px; background:var(--panel); overflow-y:auto; min-height:0; }
+.channel { display:flex; align-items:center; padding:10px; border-bottom:1px solid #1f2933; cursor:pointer; }
+.channel img { width:36px; height:36px; margin-right:10px; }
+.channel.active { background:#1f2937; }
+.star { margin-left:auto; color:gold; }
+#channelCount { padding:5px 10px; font-weight:bold; }
 
-.topbar input, .topbar select {
-  padding: 8px;
-  border-radius: 6px;
-  border: none;
-  flex: 1;
-  min-width: 100px;
-}
-
-/* App layout */
-.app {
-  display: flex;
-  flex: 1;
-  gap: 10px;
-  overflow: hidden;
-  height: calc(100vh - 50px);
-}
-
-/* Player */
-.player {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  background: black;
-}
-
-.now {
-  padding: 8px;
-  font-weight: bold;
-  background: #111827;
-  flex-shrink: 0;
-}
-
-video {
-  width: 100%;
-  flex: 1;
-  object-fit: contain; /* scales without cropping */
-  background: black;
-}
-
-.controls {
-  display: flex;
-  justify-content: space-around;
-  padding: 5px;
-  background: rgba(0,0,0,0.6);
-  flex-shrink: 0;
-}
-
-.controls button {
-  flex: 1;
-  margin: 0 3px;
-  padding: 6px;
-  font-size: 14px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  background: #1f2933;
-  color: var(--text);
-}
-
-/* Channels list */
-.channels {
-  flex: 1;
-  max-width: 350px;
-  background: var(--panel);
-  overflow-y: auto;
-  min-height: 0;
-}
-
-.channel {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #1f2933;
-  cursor: pointer;
-}
-
-.channel img {
-  width: 36px;
-  height: 36px;
-  margin-right: 10px;
-}
-
-.channel.active {
-  background: #1f2937;
-}
-
-.channel.flash {
-  animation: flashHighlight 0.6s ease;
-}
-
-.star {
-  margin-left: auto;
-  color: gold;
-}
-
-#channelCount {
-  padding: 5px 10px;
-  font-weight: bold;
-}
-
-/* Flash animation */
-@keyframes flashHighlight {
-  0%   { background-color: #22c55e; }
-  50%  { background-color: #1f2937; }
-  100% { background-color: #22c55e; }
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .app {
-    flex-direction: column;
-    height: calc(100vh - 50px);
-  }
-
-  .player {
-    flex: 0 0 auto;
-    min-height: 200px;
-  }
-
-  video {
-    height: 35vh;
-    max-height: 35vh;
-  }
-
-  .channels {
-    height: calc(65vh - 40px);
-    max-width: 100%;
-    overflow-y: auto;
-  }
-
-  .controls button {
-    font-size: 12px;
-    padding: 5px;
-  }
+@media (max-width:768px) {
+  .app { flex-direction:column; height:calc(100vh - 50px); }
+  .player { flex:0 0 auto; min-height:200px; }
+  video { height:35vh; max-height:35vh; }
+  .channels { height:calc(65vh - 40px); max-width:100%; overflow-y:auto; }
+  .controls button { font-size:12px; padding:5px; }
 }
 </style>
 </head>
 
 <body>
-
 <div class="topbar">
   <div class="title">📺 Live TV Player</div>
-
   <select id="language" onchange="onLanguageChange()"></select>
   <input id="search" placeholder="Search channel" oninput="renderChannels()">
   <select id="category" onchange="onCategoryChange()">
@@ -218,26 +73,5 @@ video {
     <div id="channels"></div>
   </div>
 </div>
-
-<script>
-// ------------------- FULL RESPONSIVE PLAYER -------------------
-function resizePlayer() {
-  const video = document.getElementById('video');
-  const player = document.querySelector('.player');
-  const topbarHeight = document.querySelector('.topbar').offsetHeight;
-  const controlsHeight = document.querySelector('.controls').offsetHeight;
-  const nowHeight = document.querySelector('.now').offsetHeight;
-  const windowHeight = window.innerHeight;
-
-  const newHeight = windowHeight - topbarHeight - controlsHeight - nowHeight - 20;
-  if (window.innerWidth > 768) {
-    video.style.height = `${newHeight}px`;
-  }
-}
-
-window.addEventListener('resize', resizePlayer);
-window.addEventListener('DOMContentLoaded', resizePlayer);
-</script>
-
 </body>
 </html>
