@@ -2,9 +2,8 @@
 const PROXY = "https://prdigitv-ts-proxy.onrender.com/"; // Your TS proxy
 
 const LANGUAGE_M3U = {
-  Telugu2: PROXY + "https://pabbhi.github.io/prdigitv/stb/final.m3u",
-  Hindi: PROXY + "https://iptv-org.github.io/iptv/languages/hin.m3u",
   Telugu: PROXY + "https://iptv-org.github.io/iptv/languages/tel.m3u",
+  Hindi: PROXY + "https://iptv-org.github.io/iptv/languages/hin.m3u",
   Tamil: PROXY + "https://iptv-org.github.io/iptv/languages/tam.m3u",
   Kannada: PROXY + "https://iptv-org.github.io/iptv/languages/kan.m3u",
   Marathi: PROXY + "https://iptv-org.github.io/iptv/languages/mar.m3u",
