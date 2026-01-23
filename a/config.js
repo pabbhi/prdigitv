@@ -1,6 +1,6 @@
 const LANGUAGE_M3U = {
-  Hindi: "https://iptv-org.github.io/iptv/languages/hin.m3u",
   Telugu: "https://iptv-org.github.io/iptv/languages/tel.m3u",
+  Hindi: "https://iptv-org.github.io/iptv/languages/hin.m3u",
   Tamil: "https://iptv-org.github.io/iptv/languages/tam.m3u",
   Kannada: "https://iptv-org.github.io/iptv/languages/kan.m3u",
   Marathi: "https://iptv-org.github.io/iptv/languages/mar.m3u",
@@ -17,3 +17,4 @@ const LANGUAGE_M3U = {
 };
 
 const DEFAULT_LANGUAGE = "Telugu";
+
