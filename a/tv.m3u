@@ -72,9 +72,10 @@ http://116.90.120.152:8000/play/a0hi/index.m3u8
 #EXTINF:-1 tvg-id="StarSports3.in@SD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_STAR_SPORTS_3/images/LOGO_HD/image.png" group-title="Sports | English",Star Sports 3 (576p)
 http://116.90.120.152:8000/play/a0js/index.m3u8
 
-#EXTINF:-1 tvg-id="StarSportsSelect1.in@HD" tvg-logo="https://i.imgur.com/Mh9tKPx.png" group-title="Sports | Select",Star Sports Select 1 HD (1080p)
+#EXTINF:-1 tvg-id="StarSportsSelect1.in@HD" tvg-logo="https://i.imgur.com/Mh9tKPx.png" group-title="Sports | English",Star Sports Select 1 HD (1080p)
 http://116.90.120.152:8000/play/a0h9/index.m3u8
 
-#EXTINF:-1 tvg-id="StarSportsSelect2.in@HD" tvg-logo="https://i.imgur.com/FtRT73R.png" group-title="Sports | Select",Star Sports Select 2 HD (1080p)
+#EXTINF:-1 tvg-id="StarSportsSelect2.in@HD" tvg-logo="https://i.imgur.com/FtRT73R.png" group-title="Sports | English",Star Sports Select 2 HD (1080p)
 http://116.90.120.152:8000/play/a0ha/index.m3u8
+
 
