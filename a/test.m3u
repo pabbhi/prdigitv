@@ -1,0 +1,21 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="geminitvhd.in" tvg-name="Telugu: GEMINI (FHD)" tvg-logo="https://i.ibb.co/SKJQvqR/Gemini-TV.png" group-title="TELUGU",Telugu: GEMINI (FHD)
+https://starshare.online:443/live/653579973/670975356/23315.ts
+#EXTINF:-1 tvg-id="etvhd.in" tvg-name="Telugu: Etv HD" tvg-logo="https://i.ibb.co/r3vmJq9/download-4.png" group-title="TELUGU",Telugu: Etv HD
+https://starshare.online:443/live/653579973/670975356/9017.ts
+#EXTINF:-1 tvg-id="starmaahd.in" tvg-name="Telugu: STAR MAA TV HD" tvg-logo="https://i.ibb.co/yn807cB/download-21.png" group-title="TELUGU",Telugu: STAR MAA TV HD
+https://starshare.online:443/live/653579973/670975356/168.ts
+#EXTINF:-1 tvg-id="zeeteluguhd.in" tvg-name="Telugu: ZEE-TELUGU (FHD)" tvg-logo="https://i.ibb.co/9336p4j/download.png" group-title="TELUGU",Telugu: ZEE-TELUGU (FHD)
+https://starshare.online:443/live/653579973/670975356/23316.ts
+#EXTINF:-1 tvg-id="ts957" tvg-name="Telugu: STAR MAA MOVIES HD" tvg-logo="https://i.ibb.co/72grYNk/Star-maa-logo-2023.png" group-title="TELUGU",Telugu: STAR MAA MOVIES HD
+https://starshare.online:443/live/653579973/670975356/9015.ts
+#EXTINF:-1 tvg-id="ts636" tvg-name="Telugu: Zee Cinemalu HD" tvg-logo="https://i.ibb.co/jhL5mtq/download.png" group-title="TELUGU",Telugu: Zee Cinemalu HD
+https://starshare.online:443/live/653579973/670975356/9016.ts
+#EXTINF:-1 tvg-id="ts840" tvg-name="Telugu: GEMINI COMEDY HD" tvg-logo="https://i.ibb.co/CQhttzT/download-25.png" group-title="TELUGU",Telugu: GEMINI COMEDY HD
+https://starshare.online:443/live/653579973/670975356/9042.ts
+#EXTINF:-1 tvg-id="ts954" tvg-name="Telugu: STAR MAA GOLD" tvg-logo="" group-title="TELUGU",Telugu: STAR MAA GOLD
+https://starshare.online:443/live/653579973/670975356/9043.ts
+#EXTINF:-1 tvg-id="ts361" tvg-name="Telugu: GEMINI LIFE HD" tvg-logo="https://i.ibb.co/vXYWqvD/download-24.png" group-title="TELUGU",Telugu: GEMINI LIFE HD
+https://starshare.online:443/live/653579973/670975356/9044.ts
+#EXTINF:-1 tvg-id="ts1341" tvg-name="Telugu: ETV Cinema (4K)" tvg-logo="https://i.ibb.co/p4knk5y/images-4.png" group-title="TELUGU",Telugu: ETV Cinema (4K)
+https://starshare.online:443/live/653579973/670975356/9045.ts
