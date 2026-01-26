@@ -1,11 +1,10 @@
 #EXTM3U
-#EXTM3U
 
 ########################
 # TELUGU CHANNELS
 ########################
 
-#EXTINF:-1 tvg-id="GeminiTV.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_TV_HD/images/LOGO_HD/image.png" group-title="Telugu | General",Gemini TV HD (1080p)
+#EXTINF:-1 tvg-id="GeminiTV.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_TV_HD/images/LOGO_HD/image.png" group-title="Telugu | Entertainment",Gemini TV HD (1080p)
 https://livestream10.sunnxt.com/DolbyVision/GeminiTV_HDR/GeminiTV_HDR_Endpoints/GeminiTV-HDR10-IN-index.m3u8
 
 #EXTINF:-1 tvg-id="ETVTelugu.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ETV_HD/images/LOGO_HD/image.png" group-title="Telugu | Entertainment",ETV Telugu HD (1080p)
@@ -17,19 +16,19 @@ https://d27tnkf60df3v4.cloudfront.net/v1/master/9d43eacaed199f8d5883927e7aef514a
 #EXTINF:-1 tvg-id="ETVJosh.in@HD" tvg-logo="https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900004LP_20250811T033452SQUARE.png" group-title="Telugu | Entertainment",ETV Josh HD (1080p)
 https://cc-uyh1ow5zouoio.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-uyh1ow5zouoio/WWBI/Amagi/ETV_Josh_IN/playlist.m3u8
 
-#EXTINF:-1 tvg-id="GeminiMovies.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_MOVIES/images/LOGO_HD/image.png" group-title="Telugu | Movies",Gemini Movies HD (1080p)
+#EXTINF:-1 tvg-id="GeminiMovies.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_MOVIES/images/LOGO_HD/image.png" group-title="Telugu | Entertainment",Gemini Movies HD (1080p)
 http://103.167.255.18:8085/play/a0n5/index.m3u8
 
-#EXTINF:-1 tvg-id="ETVCinema.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ETV_CINEMA/images/LOGO_HD/image.png" group-title="Telugu | Movies",ETV Cinema HD (1080p)
+#EXTINF:-1 tvg-id="ETVCinema.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ETV_CINEMA/images/LOGO_HD/image.png" group-title="Telugu | Entertainment",ETV Cinema HD (1080p)
 https://d1q7j6ha51ro6f.cloudfront.net/v1/master/9d43eacaed199f8d5883927e7aef514a8a08e108/ETV_CINEMA_H264-3_cloud_in/index.m3u8
 
-#EXTINF:-1 tvg-id="ZeeCinemalu.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ZEE_CINEMALU/images/LOGO_HD/LOGO_HD_image.png" group-title="Telugu | Movies",Zee Cinemalu HD (1080p)
+#EXTINF:-1 tvg-id="ZeeCinemalu.in@HD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ZEE_CINEMALU/images/LOGO_HD/LOGO_HD_image.png" group-title="Telugu | Entertainment",Zee Cinemalu HD (1080p)
 http://103.167.255.18:8085/play/a0ns/index.m3u8
 
-#EXTINF:-1 tvg-id="GeminiComedy.in@SD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_COMEDY/images/LOGO_HD/image.png" group-title="Telugu | Comedy",Gemini Comedy (360p)
+#EXTINF:-1 tvg-id="GeminiComedy.in@SD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_COMEDY/images/LOGO_HD/image.png" group-title="Telugu | Entertainment",Gemini Comedy (360p)
 http://103.140.254.2:3500/live/729.m3u8
 
-#EXTINF:-1 tvg-id="ETVComedy.in@HD" tvg-logo="https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900003U3_20251106T195117SQUARE.png" group-title="Telugu | Comedy",ETV Comedy HD (1080p)
+#EXTINF:-1 tvg-id="ETVComedy.in@HD" tvg-logo="https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900003U3_20251106T195117SQUARE.png" group-title="Telugu | Entertainment",ETV Comedy HD (1080p)
 https://cc-wie8j8y69d2uy.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-wie8j8y69d2uy/WWBI/Amagi/ETV_Comedy_IN/playlist.m3u8
 
 #EXTINF:-1 tvg-id="GeminiLife.in@SD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_GEMINI_LIFE/images/LOGO_HD/image.png" group-title="Telugu | Lifestyle",Gemini Life (360p)
@@ -38,13 +37,13 @@ http://103.140.254.2:3500/live/684.m3u8
 #EXTINF:-1 tvg-id="ETVLife.in@SD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ETV_LIFE/images/LOGO_HD/image.png" group-title="Telugu | Lifestyle",ETV Life (480p)
 https://d2cj1h11htct8o.cloudfront.net/v1/master/9d43eacaed199f8d5883927e7aef514a8a08e108/ETV_LIFE_H264_cloud_in/index.m3u8
 
-#EXTINF:-1 tvg-id="ETVMusic.in@HD" tvg-logo="https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900002RV_20250811T033455SQUARE.png" group-title="Telugu | Music",ETV Music HD (1080p)
+#EXTINF:-1 tvg-id="ETVMusic.in@HD" tvg-logo="https://tvpnlogopus.samsungcloud.tv/platform/image/sourcelogo/vc/00/02/34/IN4900002RV_20250811T033455SQUARE.png" group-title="Telugu | Entertainment",ETV Music HD (1080p)
 https://cc-szivnms4rlah6.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-szivnms4rlah6/WWBI/Amagi/ETV_Music_IN/playlist.m3u8
 
-#EXTINF:-1 tvg-id="TV9Telugu.in@SD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_TELUGU_NEWS/images/LOGO_HD/image.png" group-title="Telugu | News",TV9 Telugu (720p)
+#EXTINF:-1 tvg-id="TV9Telugu.in@SD" tvg-logo="https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_TV9_TELUGU_NEWS/images/LOGO_HD/image.png" group-title="Telugu | Entertainment",TV9 Telugu (720p)
 https://dyjmyiv3bp2ez.cloudfront.net/pub-iotv9telcmjhcs/liveabr/playlist.m3u8
 
-#EXTINF:-1 tvg-id="NTVTelugu.in@SD" tvg-logo="https://i.imgur.com/WqTIoWS.png" group-title="Telugu | News",NTV Telugu (576p)
+#EXTINF:-1 tvg-id="NTVTelugu.in@SD" tvg-logo="https://i.imgur.com/WqTIoWS.png" group-title="Telugu | Entertainment",NTV Telugu (576p)
 https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/ntv_nim_https/110322/ntv/playlist.m3u8
 
 
@@ -78,3 +77,4 @@ http://116.90.120.152:8000/play/a0h9/index.m3u8
 
 #EXTINF:-1 tvg-id="StarSportsSelect2.in@HD" tvg-logo="https://i.imgur.com/FtRT73R.png" group-title="Sports | Select",Star Sports Select 2 HD (1080p)
 http://116.90.120.152:8000/play/a0ha/index.m3u8
+
