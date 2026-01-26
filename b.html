@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IPTV Player - Telugu/Hindi/English</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+  h1 { text-align: center; }
+  #channels { margin-bottom: 20px; max-width: 500px; margin-left:auto;margin-right:auto; }
+  button { display: block; margin: 5px 0; padding: 10px; width: 100%; }
+  video { display: block; margin: 20px auto; width: 640px; height: 360px; background: black; }
+  input, button.fetch { padding: 10px; width: 400px; max-width: 100%; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<h1>IPTV Player (Telugu/Hindi/English)</h1>
+
+<input type="text" id="m3uUrl" placeholder="Enter .m3u URL here" />
+<button class="fetch" onclick="loadPlaylist()">Load Channels</button>
+
+<div id="channels"></div>
+<video id="video" controls></video>
+
+<script>
+const LANGUAGE_KEYWORDS = ['telugu','తెలుగు','hindi','हिंदी','english'];
+
+function containsLanguage(text){
+    text = text.toLowerCase();
+    return LANGUAGE_KEYWORDS.some(lang => text.includes(lang));
+}
+
+async function loadPlaylist(){
+    const url = document.getElementById('m3uUrl').value.trim();
+    if(!url) return alert('Enter a valid M3U URL.');
+
+    try {
+        const response = await fetch(url);
+        if(!response.ok) throw new Error('Failed to fetch playlist');
+        const text = await response.text();
+        const lines = text.split(/\r?\n/);
+
+        const channelsDiv = document.getElementById('channels');
+        channelsDiv.innerHTML = '';
+
+        for(let i=0; i<lines.length; i++){
+            const line = lines[i];
+            if(line.startsWith('#EXTINF')){
+                const name = line.split(',')[1] || line;
+                const streamUrl = lines[i+1] || '';
+                if(containsLanguage(name) && streamUrl){
+                    const btn = document.createElement('button');
+                    btn.textContent = name;
+                    btn.onclick = () => playChannel(streamUrl);
+                    channelsDiv.appendChild(btn);
+                }
+                i++; // skip URL line
+            }
+        }
+
+        if(channelsDiv.innerHTML === '') {
+            channelsDiv.innerHTML = '<p>No Telugu, Hindi, or English channels found.</p>';
+        }
+
+    } catch(err){
+        alert('Error loading playlist: ' + err.message);
+    }
+}
+
+function playChannel(url){
+    const video = document.getElementById('video');
+
+    if(Hls.isSupported()){
+        if(window.hls) window.hls.destroy(); // destroy previous instance
+        window.hls = new Hls();
+        window.hls.loadSource(url);
+        window.hls.attachMedia(video);
+        window.hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            video.play();
+        });
+    } else if(video.canPlayType('application/vnd.apple.mpegurl')){
+        video.src = url;
+        video.play();
+    } else {
+        alert('HLS not supported in this browser.');
+    }
+}
+</script>
+
+</body>
+</html>
