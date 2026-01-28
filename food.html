@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Library</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 15px;
+}
+h1 { text-align: center; margin-bottom: 20px; }
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+select, .dropdown-wrapper input {
+  padding: 10px;
+  font-size: 16px;
+  width: 220px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.dropdown-wrapper {
+  position: relative;
+  width: 220px;
+}
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 99;
+  display: none;
+}
+.dropdown-list div {
+  padding: 8px;
+  cursor: pointer;
+}
+.dropdown-list div:hover {
+  background: #e9e9e9;
+}
+#videoContainer {
+  text-align: center;
+  margin-top: 20px;
+}
+iframe, video {
+  width: 100%;
+  max-width: 700px;
+  height: 400px;
+}
+@media (max-width:600px){
+  iframe, video { height:220px; }
+}
+</style>
+</head>
+<body>
+
+<h1>🎬 Video Library</h1>
+
+<div class="controls">
+  <select id="categorySelect">
+    <option value="">Select Category</option>
+  </select>
+
+  <div class="dropdown-wrapper" id="videoDropdownWrapper" style="display:none;">
+    <input type="text" id="videoSearch" placeholder="Search video...">
+    <div class="dropdown-list" id="videoList"></div>
+  </div>
+</div>
+
+<div id="videoContainer"></div>
+
+<script>
+/* ===== CONFIG ===== */
+const spreadsheetId = "1Ie6Or6NUDazObRXlmyx2R1McjYCpXR5OYU4nmO0HWvA"; 
+const apiKey = "AIzaSyBTBAAIkwfrbyEtYRbFISgtdbc6LuAUadU"; 
+const sheetName = "Food";
+
+let allVideos = [];
+let currentVideos = [];
+
+/* ===== LOAD DATA FROM GOOGLE SHEETS ===== */
+async function loadVideos() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}?key=${apiKey}`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!data.values || data.values.length < 2) return;
+
+    const rows = data.values.slice(1);
+    rows.forEach(row => {
+      const [name,type,link] = row;
+      if(name && type && link) allVideos.push({name:name.trim(),type:type.trim(),link:link.trim()});
+    });
+
+    populateCategories();
+  } catch (err) {
+    console.error("Error loading sheet data:", err);
+  }
+}
+
+/* ===== POPULATE CATEGORY DROPDOWN ===== */
+function populateCategories() {
+  const categories = [...new Set(allVideos.map(v=>v.type))];
+  const select = document.getElementById("categorySelect");
+  categories.forEach(cat=>{
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = cat;
+    select.appendChild(option);
+  });
+}
+
+/* ===== POPULATE SEARCHABLE VIDEO DROPDOWN ===== */
+function populateVideoDropdown(videos) {
+  const wrapper = document.getElementById("videoDropdownWrapper");
+  const input = document.getElementById("videoSearch");
+  const listDiv = document.getElementById("videoList");
+
+  wrapper.style.display = videos.length ? "inline-block" : "none";
+  input.value = "";
+  listDiv.innerHTML = "";
+
+  videos.forEach(v=>{
+    const div = document.createElement("div");
+    div.textContent = v.name;
+    div.addEventListener("click", ()=>{
+      input.value = v.name;
+      listDiv.style.display = "none";
+      playVideo(v.link);
+    });
+    listDiv.appendChild(div);
+  });
+
+  input.addEventListener("input", ()=>{
+    const search = input.value.toLowerCase();
+    listDiv.innerHTML = "";
+    videos.filter(v=>v.name.toLowerCase().includes(search))
+          .forEach(v=>{
+            const div = document.createElement("div");
+            div.textContent = v.name;
+            div.addEventListener("click", ()=>{
+              input.value = v.name;
+              listDiv.style.display = "none";
+              playVideo(v.link);
+            });
+            listDiv.appendChild(div);
+          });
+    listDiv.style.display = listDiv.children.length ? "block" : "none";
+  });
+
+  input.addEventListener("focus", ()=>{ 
+    listDiv.style.display = listDiv.children.length ? "block" : "none";
+  });
+
+  document.addEventListener("click", (e)=>{
+    if(!wrapper.contains(e.target)) listDiv.style.display = "none";
+  });
+}
+
+/* ===== PLAY VIDEO ===== */
+function playVideo(link) {
+  const container = document.getElementById("videoContainer");
+  container.innerHTML = "";
+
+  if(!link) return;
+
+  // YouTube videos: open in new tab
+  if(link.includes("youtube.com") || link.includes("youtu.be")) {
+    window.open(link, "_blank");
+    return;
+  }
+
+  // Direct MP4 or iframe
+  container.innerHTML = `<iframe src="${link}" frameborder="0" allowfullscreen></iframe>`;
+}
+
+/* ===== EVENT LISTENERS ===== */
+document.getElementById("categorySelect").addEventListener("change", e=>{
+  const cat = e.target.value;
+  if(cat){
+    currentVideos = allVideos.filter(v=>v.type===cat);
+    populateVideoDropdown(currentVideos);
+    document.getElementById("videoContainer").innerHTML = "";
+  } else {
+    document.getElementById("videoDropdownWrapper").style.display = "none";
+    document.getElementById("videoContainer").innerHTML = "";
+  }
+});
+
+/* ===== INITIAL LOAD ===== */
+loadVideos();
+</script>
+
+</body>
+</html>
