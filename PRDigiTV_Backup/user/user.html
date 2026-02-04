@@ -204,7 +204,7 @@ button:hover { background: #0a0; }
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwQ9uAi-9Kv0yuk5PIvXP3DJio7SAZ3IzpV3-wn3_ZhnguNpzx8Agw9GkuaWw3ZC1OqOQ/exec";
 const token=localStorage.getItem("token");
-if(!token) location.href="https://prdigitv.page.gd/user/login.html";
+if(!token) location.href="login.html";
 
 let sessionInterval;
 
@@ -245,7 +245,7 @@ function logout(reason="LOGOUT"){
     body:JSON.stringify({action:"logout",token,reason})
   }).finally(()=>{
     localStorage.clear();
-    location.href="https://prdigitv.page.gd/user/login.html";
+    location.href="login.html";
   });
 }
 
