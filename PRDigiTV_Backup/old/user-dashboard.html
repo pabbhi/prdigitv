@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PRDigiTV - User Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <h2>User Dashboard</h2>
+  <div id="userDetails"></div>
+  
+  <h3>Refer & Earn</h3>
+  <input type="email" id="refNewEmail" placeholder="New User Email" required>
+  <input type="text" id="refName" placeholder="Name" required>
+  <input type="text" id="refMobile" placeholder="Mobile" required>
+  <button onclick="submitReferral()">Submit Referral</button>
+  <p id="refMsg" style="color:green;"></p>
+  <button onclick="logout()">Logout</button>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

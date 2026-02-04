@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PR DigiTV - Dashboard</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#0f0f0f;color:#fff}
+header{background:#000;padding:10px;text-align:center;display:flex;justify-content:space-between;align-items:center}
+.logo{width:200px;height:auto}
+.logout{background:#c00;color:#fff;padding:5px 10px;border-radius:5px;border:none;cursor:pointer}
+.logout:hover{background:#900}
+.tabs{display:flex;gap:5px;background:#111;padding:5px;overflow-x:auto}
+.tab{padding:10px;cursor:pointer;background:#222;border-radius:5px;white-space:nowrap}
+.tab.active{background:#0c0;color:#000;font-weight:bold}
+.tab-content{padding:20px;display:none}
+.tab-content.active{display:block}
+.card{background:#222;padding:15px;border-radius:8px;margin:10px 0}
+input,select,textarea{padding:8px;margin:5px;width:200px;border-radius:5px;border:none}
+button{padding:8px 15px;background:#0c0;border:none;border-radius:5px;color:#000;font-weight:bold;cursor:pointer;margin-top:5px}
+button:hover{background:#0a0}
+.loader{border:4px solid #222;border-top:4px solid #0c0;border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin:10px auto;display:none}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+textarea{height:100px}
+</style>
+</head>
+<body>
+
+<header>
+<img src="logo.png" alt="PR DigiTV" class="logo">
+<button class="logout" onclick="logout()">Logout</button>
+</header>
+
+<div style="padding:10px">
+<h2 id="welcomeMsg"></h2>
+<div>Session Duration: <span id="sessionTimer">00:00:00</span></div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="dashboard">Dashboard</div>
+  <div class="tab" data-tab="referral">Referral Form</div>
+  <div class="tab" data-tab="yourReferrals">Your Referrals</div>
+  <div class="tab" data-tab="activity">Activity</div>
+  <div class="tab" data-tab="support">Support</div>
+</div>
+
+<div class="tab-content active" id="dashboard">
+  <div class="loader" id="dashboardLoader"></div>
+</div>
+
+<div class="tab-content" id="referral">
+  <input type="text" id="refName" placeholder="Name"><br>
+  <input type="text" id="refMobile" placeholder="Mobile"><br>
+  <input type="email" id="refEmail" placeholder="New User Email"><br>
+  <button id="saveReferralBtn">Save Referral</button>
+  <div class="loader" id="refLoader"></div>
+  <p id="refMsg"></p>
+</div>
+
+<div class="tab-content" id="yourReferrals">
+  <div class="loader" id="yourRefLoader"></div>
+</div>
+
+<div class="tab-content" id="activity">
+  <div class="loader" id="activityLoader"></div>
+</div>
+
+<div class="tab-content" id="support">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:300px">
+      <h3>Create Ticket</h3>
+      <input type="text" id="ticketMobile" placeholder="Mobile"><br>
+      <textarea id="ticketIssue" placeholder="Issue"></textarea><br>
+      <button id="createTicketBtn">Submit Ticket</button>
+      <div class="loader" id="ticketLoader"></div>
+      <p id="ticketMsg"></p>
+    </div>
+    <div style="flex:1;min-width:300px">
+      <h3>My Tickets</h3>
+      <div id="myTickets">
+        <div class="loader" id="myTicketsLoader"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQ9uAi-9Kv0yuk5PIvXP3DJio7SAZ3IzpV3-wn3_ZhnguNpzx8Agw9GkuaWw3ZC1OqOQ/exec";
+const token = localStorage.getItem("token");
+const email = localStorage.getItem("email");
+
+if(!token){ window.location.href="index.html" }
+
+let loginTime = new Date(); // fallback if no Logs fetched
+let sessionInterval;
+
+// ===== Tabs =====
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+    document.getElementById(tab.dataset.tab).classList.add("active");
+  });
+});
+
+// ===== Logout =====
+function logout(reason="LOGOUT"){
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"logout",token,reason})})
+  .finally(()=>{
+    localStorage.clear();
+    window.location.href="index.html";
+  });
+}
+
+// ===== Session Timer =====
+function startSessionTimer(startTime){
+  clearInterval(sessionInterval);
+  sessionInterval=setInterval(()=>{
+    let now = new Date();
+    let diff = Math.floor((now - startTime)/1000);
+    let h=Math.floor(diff/3600), m=Math.floor((diff%3600)/60), s=diff%60;
+    document.getElementById("sessionTimer").textContent=[h,m,s].map(n=>String(n).padStart(2,"0")).join(":");
+  },1000);
+}
+
+// ===== Dashboard =====
+function loadDashboard(){
+  const loader=document.getElementById("dashboardLoader");
+  loader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"getDashboard",token})})
+  .then(r=>r.json())
+  .then(res=>{
+    loader.style.display="none";
+    if(res.success){
+      const data=res.data;
+      document.getElementById("welcomeMsg").textContent=`Welcome ${data[1]} to PR DigiTV`;
+      dashboardDiv=document.getElementById("dashboard");
+      dashboardDiv.innerHTML="";
+      const fields=["Playlist Name","Activated Date","Expiry Date","Amount Paid","IPTV Player Name","IPTV Player Link","No of Referrals","Bonus Amount","Amount to be Paid Next Renewal"];
+      for(let i=3;i<=11;i++){
+        let card=document.createElement("div");
+        card.className="card";
+        card.innerHTML=`<strong>${fields[i-3]}:</strong> ${data[i]}`;
+        dashboardDiv.appendChild(card);
+      }
+      // Set session timer from login timestamp (assuming Logs column 3)
+      loginTime = new Date(data[2]); 
+      startSessionTimer(loginTime);
+    } else dashboardDiv.textContent=res.msg;
+  });
+}
+
+// ===== Referral =====
+document.getElementById("saveReferralBtn").addEventListener("click",()=>{
+  const name=document.getElementById("refName").value;
+  const mobile=document.getElementById("refMobile").value;
+  const newEmail=document.getElementById("refEmail").value;
+  const loader=document.getElementById("refLoader");
+  const msg=document.getElementById("refMsg");
+  if(!name || !mobile || !newEmail){ msg.textContent="Fill all fields"; return; }
+  loader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"saveReferral",token,data:{name,mobile,newEmail}})})
+  .then(r=>r.json()).then(res=>{
+    loader.style.display="none";
+    msg.textContent=res.success?"Referral saved":"Error: "+res.msg;
+    if(res.success){ document.getElementById("refName").value=""; document.getElementById("refMobile").value=""; document.getElementById("refEmail").value=""; }
+    loadReferrals(); // auto-refresh
+  });
+});
+
+// ===== Your Referrals =====
+function loadReferrals(){
+  const loader=document.getElementById("yourRefLoader");
+  loader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"getReferrals",token})})
+  .then(r=>r.json()).then(res=>{
+    loader.style.display="none";
+    const container=document.getElementById("yourReferrals");
+    container.innerHTML="";
+    if(res.success){
+      res.data.forEach(r=>{
+        let card=document.createElement("div");
+        card.className="card";
+        card.innerHTML=`<strong>New User Email:</strong> ${r[2]}<br><strong>Name:</strong> ${r[3]}<br><strong>Mobile:</strong> ${r[4]}<br><strong>Timestamp:</strong> ${new Date(r[0]).toLocaleString()}`;
+        container.appendChild(card);
+      });
+    } else container.textContent=res.msg;
+  });
+}
+
+// ===== Activity =====
+function loadActivity(){
+  const loader=document.getElementById("activityLoader");
+  loader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"getActivity",token})})
+  .then(r=>r.json()).then(res=>{
+    loader.style.display="none";
+    const container=document.getElementById("activity");
+    container.innerHTML="";
+    if(res.success){
+      res.data.forEach(a=>{
+        let card=document.createElement("div");
+        card.className="card";
+        card.innerHTML=`<strong>Login:</strong> ${new Date(a.login).toLocaleString()}<br><strong>Logout:</strong> ${a.logout?a.logout:"Active"}<br><strong>Session:</strong>${a.sessionDuration||""}`;
+        container.appendChild(card);
+      });
+    } else container.textContent=res.msg;
+  });
+}
+
+// ===== Support Tickets =====
+document.getElementById("createTicketBtn").addEventListener("click",()=>{
+  const mobile=document.getElementById("ticketMobile").value;
+  const issue=document.getElementById("ticketIssue").value;
+  const loader=document.getElementById("ticketLoader");
+  const msg=document.getElementById("ticketMsg");
+  if(!mobile || !issue){ msg.textContent="Fill all fields"; return; }
+  loader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"createSupportTicket",token,data:{mobile,issue}})})
+  .then(r=>r.json()).then(res=>{
+    loader.style.display="none";
+    msg.textContent=res.success?"Ticket Created: "+res.data.ticketNo:"Error: "+res.msg;
+    if(res.success){ document.getElementById("ticketMobile").value=""; document.getElementById("ticketIssue").value=""; loadMyTickets(); }
+  });
+});
+
+function loadMyTickets(){
+  const loader=document.getElementById("myTicketsLoader");
+  loader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"getSupportTickets",token})})
+  .then(r=>r.json()).then(res=>{
+    loader.style.display="none";
+    const container=document.getElementById("myTickets");
+    container.innerHTML="";
+    if(res.success){
+      res.data.forEach(t=>{
+        let card=document.createElement("div");
+        card.className="card";
+        card.innerHTML=`<strong>Ticket No:</strong> ${t[3]}<br><strong>Issue:</strong> ${t[2]}<br><strong>Status:</strong> ${t[4]}<br><strong>Mobile:</strong> ${t[1]}<br><strong>Created:</strong> ${new Date(t[5]).toLocaleString()}`;
+        container.appendChild(card);
+      });
+    } else container.textContent=res.msg;
+  });
+}
+
+// ===== Auto-refresh =====
+function autoRefresh(){
+  loadDashboard();
+  loadReferrals();
+  loadActivity();
+  loadMyTickets();
+}
+setInterval(autoRefresh,15000);
+
+// ===== Init =====
+loadDashboard();
+loadReferrals();
+loadActivity();
+loadMyTickets();
+
+// ===== Auto logout after inactivity 20min =====
+let logoutTimer;
+function resetTimer(){
+  clearTimeout(logoutTimer);
+  logoutTimer=setTimeout(()=>{logout("AUTO_LOGOUT");alert("Logged out due to inactivity");},20*60*1000);
+}
+document.onmousemove=resetTimer;
+document.onkeypress=resetTimer;
+document.ontouchstart=resetTimer;
+resetTimer();
+window.addEventListener("beforeunload",()=>{logout("CLOSE")});
+
+</script>
+</body>
+</html>

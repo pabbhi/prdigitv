@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRDigiTV IPTV Subscription</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="PR DigiTV Best IPTV Streaming">
+<meta property="og:description" content="PR DigiTV Best IPTV Streaming">
+<meta property="og:image" content="https://prdigitv.page.gd/logo.png">
+<meta property="og:url" content="https://prdigitv.page.gd/">
+    <link rel="icon" href="https://prdigitv.page.gd/logo.png" type="image/png">
+
+
+
+<style>
+/* Box sizing fix */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0b0b0b;
+    color: #fff;
+    padding-top: 100px; /* space for fixed header */
+    scroll-padding-top: 100px; /* smooth scroll offset */
+}
+
+a { text-decoration: none; color: inherit; }
+
+header {
+    background: #111;
+    padding: 15px 20px; /* reduced padding for mobile */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed; /* fixed header */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+header img {
+    width: 200px;
+    height: auto;
+    max-width: 50%; /* prevents overflow */
+}
+
+/* Desktop nav links */
+nav.nav-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Hamburger button (hidden on desktop) */
+.hamburger {
+    display: none;
+    font-size: 28px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.hero {
+    padding: 90px 20px;
+    text-align: center;
+    background: linear-gradient(to right, #000, #111);
+}
+
+.hero h1 {
+    font-size: 42px;
+}
+
+.section {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+    gap: 25px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.card {
+    background: #161616;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 12px 25px;
+    background: #00c3ff;
+    color: #000;
+    font-weight: bold;
+    border-radius: 30px;
+    transition: background 0.3s;
+}
+.btn:hover {
+    background: #00a1cc;
+}
+
+.pricing {
+    border: 1px solid #00c3ff;
+}
+
+.download {
+    background: #111;
+}
+
+footer {
+    background: #080808;
+    padding: 40px 20px;
+    font-size: 14px;
+}
+
+/* WhatsApp Floating Button */
+.whatsapp-float {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #25D366;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+/* Scroll to top button */
+.scroll-top {
+    position: fixed;
+    bottom: 100px; /* above WhatsApp button */
+    right: 25px;
+    width: 50px;
+    height: 50px;
+    background: #00c3ff;
+    color: #000;
+    font-size: 28px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+    display: none; /* hidden by default */
+    z-index: 999;
+    transition: background 0.3s, transform 0.3s, opacity 0.3s;
+    opacity: 0;
+}
+
+/* Bounce animation */
+.scroll-top.show {
+    display: flex;
+    opacity: 1;
+    animation: bounce 1s infinite;
+}
+
+.scroll-top:hover {
+    background: #00a1cc;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+/* Responsive Header / Hamburger Menu */
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+    }
+
+    nav.nav-links {
+        display: none; /* hide menu initially */
+        flex-direction: column;
+        width: 100%;
+        background: #111;
+        position: fixed; /* fixed below header */
+        top: 100px; /* header height */
+        left: 0;
+        padding: 10px 0;
+        text-align: center;
+        z-index: 9999;
+        overflow-y: auto; /* allow scrolling if menu is long */
+        max-height: calc(100vh - 100px);
+    }
+
+    nav.nav-links.show {
+        display: flex;
+    }
+
+    nav.nav-links a {
+        margin: 10px 0;
+        display: block;
+    }
+
+    header {
+        padding: 15px 15px;
+    }
+
+    header img {
+        width: 140px;
+    }
+}
+    
+    
+    
+    
+    
+    
+    
+</style>
+</head>
+
+<body>
+    
+    
+    <!-- Banner -->
+<div onclick="window.location.href='https://prdigitv.page.gd/trial.html'" style="position:fixed;bottom:0;width:100%;height:60px;display:flex;align-items:center;cursor:pointer;overflow:hidden;background:#000;box-shadow:0 0 25px #00ff6a,0 0 50px #00ff6a,0 0 75px #00ff6a;"><span style="display:inline-block;white-space:nowrap;padding-left:100%;animation:scrollText 10s linear infinite,flash 2s infinite;font-size:30px;font-weight:bold;color:#00ff6a;text-shadow:0 0 20px #00ff6a,0 0 35px #00ff6a,0 0 50px #00ff6a;">Click here for Free Trial</span></div><style>@keyframes scrollText{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.25}}</style>
+
+<header>
+    <a href="#"><img src="https://prdigitv.page.gd/logo.png" alt="PRDigiTV Logo"></a>
+    
+<button onclick="window.location.href='https://prdigitv.page.gd/trial.html'" style="padding:16px 40px;font-size:22px;font-weight:bold;color:#00ff6a;border:none;border-radius:40px;background:#000;text-shadow:0 0 10px #00ff6a,0 0 20px #00ff6a,0 0 30px #00ff6a;animation:flash 2s infinite;box-shadow:0 0 30px #00ff6a;cursor:pointer">Free Trial</button><style>@keyframes flash{0%,100%{opacity:1}50%{opacity:.25}}</style>
+
+
+
+    <!-- Hamburger button -->
+    <button class="hamburger" aria-label="Menu">☰</button>
+
+    <nav class="nav-links">
+        <a href="https://prdigitv.page.gd/">Home</a>
+        <a href="https://prdigitv.page.gd/#pricing">Pricing</a>
+        <a href="https://prdigitv.page.gd/#download">Download</a>
+        <a href="https://prdigitv.page.gd/user/login.html">User Login</a>
+        <a href="https://prdigitv.page.gd/trial.html">Free Trial</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>PRDigiTV IPTV Subscription</h1>
+    <p>
+        11,000+ Live Channels • 60,000+ Movies & Series • HD / 4K Quality<br>
+        Sports • News • Entertainment • Worldwide Channels
+    </p>
+    <a href="https://wa.me/+919885500066" class="btn">Chat on WhatsApp for best deal</a>
+</section>
+
+<section class="section">
+    <h2>Why Choose PRDigiTV IPTV?</h2>
+    <div class="cards">
+        <div class="card">📺 11,000+ Live Channels</div>
+        <div class="card">🎬 60,000+ Movies & Series</div>
+        <div class="card">⚡ 99.9% Uptime</div>
+        <div class="card">📱 Works on All Devices</div>
+    </div>
+</section>
+
+<section class="section" id="pricing">
+<h2>Subscription Plans</h2><br>
+<div class="cards">
+
+<div class="card pricing">
+<h3>1 Month</h3>
+<h3>$40</h3>
+<p><strong>Subscription $10</strong></p>
+<p><strong>Activation $30</strong></p>
+<p><strong>Cancel any time</strong></p>
+<p><strong>11,000+ Channels HD|4K</strong></p>
+<p><strong>60,000+ Movies & Series</strong></p>
+<p><strong>Electronic Program Guide (EPG)</strong></p>
+<p><strong>UHD, FHD, HD, SD Channels</strong></p>
+<p><strong>99.99% Uptime</strong></p>
+<p><strong>Instant Activation!</strong></p>
+<p><strong>All Device & App Compatibility</strong></p>
+<p><strong>Parental Control</strong></p>
+<p><strong>Free 18/7 Support</strong></p>
+
+<a href="https://wa.me/+919885500066?text=I%20want%201%20month%20IPTV" class="btn">Buy Now</a>
+</div>
+
+<div class="card pricing">
+<h3>3 Months</h3>
+<h3>$60</h3>
+<p><strong>Subscription $30</strong></p>
+<p><strong>Activation $30</strong></p>
+<p><strong>Cancel any time</strong></p>
+<p><strong>11,000+ Channels HD|4K</strong></p>
+<p><strong>60,000+ Movies & Series</strong></p>
+<p><strong>Electronic Program Guide (EPG)</strong></p>
+<p><strong>UHD, FHD, HD, SD Channels</strong></p>
+<p><strong>99.99% Uptime</strong></p>
+<p><strong>Instant Activation!</strong></p>
+<p><strong>All Device & App Compatibility</strong></p>
+<p><strong>Parental Control</strong></p>
+<p><strong>Free 18/7 Support</strong></p>
+
+<a href="https://wa.me/+919885500066?text=I%20want%203%20months%20IPTV" class="btn">Buy Now</a>
+</div>
+
+<div class="card pricing">
+<h3>6 Months</h3>
+<h3>$85</h3>
+<p><strong>Subscription $55</strong></p>
+<p><strong>Activation $30</strong></p>
+<p><strong>Cancel any time</strong></p>
+<p><strong>11,000+ Channels HD|4K</strong></p>
+<p><strong>60,000+ Movies & Series</strong></p>
+<p><strong>Electronic Program Guide (EPG)</strong></p>
+<p><strong>UHD, FHD, HD, SD Channels</strong></p>
+<p><strong>99.99% Uptime</strong></p>
+<p><strong>Instant Activation!</strong></p>
+<p><strong>All Device & App Compatibility</strong></p>
+<p><strong>Parental Control</strong></p>
+<p><strong>Free 18/7 Support</strong></p>
+
+<a href="https://wa.me/+919885500066?text=I%20want%206%20months%20IPTV" class="btn">Buy Now</a>
+</div>
+
+<div class="card pricing">
+<h3>12 Months</h3>
+<h3>$130</h3>
+<p><strong>Subscription $100</strong></p>
+<p><strong>Activation $30  (one time)</strong></p>
+<p><strong>Cancel any time</strong></p>
+<p><strong>11,000+ Channels HD|4K</strong></p>
+<p><strong>60,000+ Movies & Series</strong></p>
+<p><strong>Electronic Program Guide (EPG)</strong></p>
+<p><strong>UHD, FHD, HD, SD Channels</strong></p>
+<p><strong>99.99% Uptime</strong></p>
+<p><strong>Instant Activation!</strong></p>
+<p><strong>All Device & App Compatibility</strong></p>
+<p><strong>Parental Control</strong></p>
+<p><strong>Free 18/7 Support</strong></p>
+
+<a href="https://wa.me/+919885500066?text=I%20want%2012%20months%20IPTV" class="btn">Buy Now</a>
+</div>
+
+</div>
+</section>
+
+<section class="section download" id="download">
+<h2>Download IPTV App (APK)</h2>
+<p>Install IPTV App on Android TV, Mobile & Firestick</p>
+<a href="StarshareIPTV.apk" class="btn">⬇ Download APK</a>
+</section>
+
+<section class="section">
+<h2>Supported Devices</h2>
+<p>
+Smart TVs • Android TV • Firestick • iPhone • iPad • Windows • Mac • MAG • IPTV Boxes
+</p>
+</section>
+
+<footer>
+<p>PRDigiTV IPTV – Worldwide IPTV Service</p>
+<p>Support: WhatsApp 24/7</p>
+</footer>
+
+<!-- FLOATING WHATSAPP -->
+<a href="https://wa.me/+919885500066" class="whatsapp-float">💬</a>
+
+<!-- SCROLL TO TOP -->
+<a href="#" class="scroll-top" id="scrollTop">⬆</a>
+
+<script>
+const hamburger = document.querySelector('.hamburger');
+const navLinks = document.querySelector('.nav-links');
+
+// Hamburger toggle
+hamburger.addEventListener('click', () => {
+    navLinks.classList.toggle('show');
+});
+
+// Collapse menu on link click
+navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+        navLinks.classList.remove('show');
+    });
+});
+
+// Scroll to top
+const scrollTopBtn = document.getElementById('scrollTop');
+
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+        scrollTopBtn.classList.add('show');
+    } else {
+        scrollTopBtn.classList.remove('show');
+    }
+});
+
+scrollTopBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+
+</body>
+</html>

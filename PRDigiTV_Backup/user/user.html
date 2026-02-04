@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PR DigiTV - User Dashboard</title>
+
+<style>
+/* ====== GLOBAL ====== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  background: #000;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+header .logo {
+  width: 150px;
+  height: auto;
+}
+.logout {
+  background: #c00;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.logout:hover { background: #900; }
+
+/* ====== TABS ====== */
+.tabs {
+  display: flex;
+  gap: 6px;
+  background: #111;
+  padding: 6px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.tab {
+  padding: 10px 14px;
+  background: #222;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tab.active { background: #0c0; color: #000; font-weight: bold; }
+
+/* ====== TAB CONTENT ====== */
+.tab-content {
+  display: none;
+  padding: 20px 10px;
+}
+.tab-content.active { display: block; }
+
+/* ====== CARDS ====== */
+.card {
+  background: #222;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+}
+
+/* ====== DASHBOARD GRID ====== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* ====== FORM ELEMENTS ====== */
+input, textarea, select, button {
+  width: 100%;
+  max-width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+  border: none;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+textarea { height: 100px; }
+button {
+  background: #0c0;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+button:hover { background: #0a0; }
+
+/* ====== LOADERS ====== */
+.loader {
+  border: 4px solid #222;
+  border-top: 4px solid #0c0;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 15px auto;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ====== RESPONSIVE ====== */
+@media(max-width:768px){
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  header .logout { align-self: flex-end; }
+  .tab-content { padding: 15px 5px; }
+  .form-small input, .form-small textarea { width: 100%; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .tabs { padding: 6px 0; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    
+      <a href="https://prdigitv.page.gd/">
+    <img src="logo.png" alt="PR DigiTV" class="logo">
+  </a>
+    
+  <div>Session Duration: <strong id="sessionTimer">00:00:00</strong></div>
+  <button class="logout" onclick="logout()">Logout</button>
+</header>
+
+<div style="padding:10px">
+  <h2 id="welcomeMsg"></h2>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="dashboard">Dashboard</div>
+  <div class="tab" data-tab="referral">Referral</div>
+  <div class="tab" data-tab="yourReferrals">Your Referrals</div>
+  <div class="tab" data-tab="activity">Activity</div>
+  <div class="tab" data-tab="support">Support</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="tab-content active" id="dashboard">
+  <div class="loader" id="dashboardLoader"></div>
+</div>
+
+<!-- REFERRAL -->
+<div class="tab-content form-small" id="referral">
+  <input id="refName" placeholder="Name"><br>
+  <input id="refMobile" placeholder="Mobile"><br>
+  <input id="refEmail" placeholder="New User Email"><br><br>
+  <button id="saveReferralBtn">Save Referral</button>
+  <div class="loader" id="refLoader"></div>
+  <p id="refMsg"></p>
+</div>
+
+<!-- YOUR REFERRALS -->
+<div class="tab-content" id="yourReferrals">
+  <div class="loader" id="yourRefLoader"></div>
+</div>
+
+<!-- ACTIVITY -->
+<div class="tab-content" id="activity">
+  <div class="loader" id="activityLoader"></div>
+</div>
+
+<!-- SUPPORT -->
+<div class="tab-content" id="support">
+  <div class="tabs">
+    <div class="tab active" data-support="create">Create Ticket</div>
+    <div class="tab" data-support="tickets">My Tickets</div>
+  </div>
+
+  <div id="supportCreate">
+    <input id="ticketMobile" placeholder="Mobile"><br>
+    <textarea id="ticketIssue" placeholder="Issue"></textarea><br>
+    <button id="createTicketBtn">Submit Ticket</button>
+    <div class="loader" id="ticketLoader"></div>
+    <p id="ticketMsg"></p>
+  </div>
+
+  <div id="supportTickets" style="display:none">
+    <div id="myTickets">
+      <div class="loader" id="myTicketsLoader"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwQ9uAi-9Kv0yuk5PIvXP3DJio7SAZ3IzpV3-wn3_ZhnguNpzx8Agw9GkuaWw3ZC1OqOQ/exec";
+const token=localStorage.getItem("token");
+if(!token) location.href="https://prdigitv.page.gd/user/login.html";
+
+let sessionInterval;
+
+/* ---------- MAIN TABS ---------- */
+document.querySelectorAll(".tab[data-tab]").forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll(".tab[data-tab]").forEach(t=>t.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.tab).classList.add("active");
+  };
+});
+    
+/* ---------- SUPPORT SUBTABS ---------- */
+document.querySelectorAll(".tab[data-support]").forEach(tab => {
+  tab.onclick = () => {
+    // Remove active class from all support subtabs
+    document.querySelectorAll(".tab[data-support]").forEach(t => t.classList.remove("active"));
+    // Hide both support content divs
+    document.getElementById("supportCreate").style.display = "none";
+    document.getElementById("supportTickets").style.display = "none";
+
+    // Activate the clicked tab
+    tab.classList.add("active");
+    if(tab.dataset.support === "create"){
+      document.getElementById("supportCreate").style.display = "block";
+    } else {
+      document.getElementById("supportTickets").style.display = "block";
+    }
+  };
+});
+    
+
+/* ---------- LOGOUT ---------- */
+function logout(reason="LOGOUT"){
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({action:"logout",token,reason})
+  }).finally(()=>{
+    localStorage.clear();
+    location.href="https://prdigitv.page.gd/user/login.html";
+  });
+}
+
+/* ---------- SESSION TIMER ---------- */
+function startSessionTimer(startTime){
+  clearInterval(sessionInterval);
+  sessionInterval=setInterval(()=>{
+    let diff=Math.floor((Date.now()-startTime)/1000);
+    let h=Math.floor(diff/3600);
+    let m=Math.floor(diff%3600/60);
+    let s=diff%60;
+    sessionTimer.textContent=[h,m,s].map(n=>String(n).padStart(2,"0")).join(":");
+  },1000);
+}
+
+/* ---------- DASHBOARD ---------- */
+function loadDashboard() {
+  dashboardLoader.style.display = "block";
+
+  fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "getDashboard", token }) })
+    .then(r => r.json())
+    .then(res => {
+      dashboardLoader.style.display = "none";
+      if (!res.success) return;
+
+      let d = res.data;
+
+      // Welcome message
+      welcomeMsg.textContent = `Welcome ${d[0]}`;
+
+      // Session timer
+      let loginTime = new Date(d[2]);
+      if (isNaN(loginTime)) loginTime = new Date();
+      startSessionTimer(loginTime);
+
+      // Dashboard grid
+      dashboard.innerHTML = '<div class="dashboard-grid" id="dashGrid"></div>';
+      let fields = [
+        "Playlist Name",
+        "Activated Date",
+        "Expiry Date",
+        "Amount Paid",
+        "IPTV Player",
+        "Player Link",
+        "Referrals",
+        "Bonus",
+        "Next Renewal Amount"
+      ];
+
+      for (let i = 3; i <= 11; i++) {
+        let card = document.createElement("div");
+        card.className = "card";
+
+        let value = d[i];
+
+        // Handle dates (only date, no time)
+        if (fields[i - 3].includes("Date")) {
+          value = value ? new Date(value) : null;
+          value = value ? value.toLocaleDateString() : ""; // only date
+        }
+
+        // Handle currency fields
+        else if (["Amount Paid", "Bonus", "Next Renewal Amount"].includes(fields[i - 3])) {
+          value = value ? `$${parseFloat(value).toFixed(2)}` : "$0.00";
+        }
+
+        // Fallback for empty values
+        else {
+          value = value || "";
+        }
+
+        card.innerHTML = `<strong>${fields[i - 3]}:</strong> ${value}`;
+        dashGrid.appendChild(card);
+      }
+    });
+}
+
+
+
+/* ---------- REFERRAL ---------- */
+saveReferralBtn.onclick=()=>{
+  if(!refName.value||!refMobile.value||!refEmail.value){
+    refMsg.textContent="Fill all fields"; return;
+  }
+  refLoader.style.display="block";
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"saveReferral",
+      token,
+      data:{name:refName.value,mobile:refMobile.value,newEmail:refEmail.value}
+    })
+  }).then(r=>r.json()).then(res=>{
+    refLoader.style.display="none";
+    refMsg.textContent=res.success?"Referral Saved":"Error";
+    if(res.success){
+      refName.value=refMobile.value=refEmail.value="";
+      loadReferrals();loadActivity();loadDashboard();
+    }
+  });
+}
+
+/* ---------- YOUR REFERRALS ---------- */
+function loadReferrals(){
+  yourRefLoader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"getReferrals",token})})
+  .then(r=>r.json()).then(res=>{
+    yourRefLoader.style.display="none";
+    yourReferrals.innerHTML="";
+    if(!res.success) return;
+    res.data.sort((a,b)=>new Date(b[0])-new Date(a[0]))
+    .forEach(r=>{
+      yourReferrals.innerHTML+=`
+        <div class="card">
+          <strong>Email:</strong> ${r[2]}<br>
+          <strong>Name:</strong> ${r[3]}<br>
+          <strong>Mobile:</strong> ${r[4]}<br>
+          <strong>Time:</strong> ${new Date(r[0]).toLocaleString()}
+        </div>`;
+    });
+  });
+}
+
+/* ---------- ACTIVITY ---------- */
+function loadActivity() {
+  activityLoader.style.display = "block";
+
+  fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "getActivity", token }) })
+    .then(r => r.json())
+    .then(res => {
+      activityLoader.style.display = "none";
+      activity.innerHTML = "";
+      if (!res.success) return;
+
+      res.data
+        .sort((a, b) => new Date(b.login) - new Date(a.login))
+        .forEach(a => {
+          let login = a.login ? new Date(a.login).toLocaleString() : "";
+          let logout = a.logout ? new Date(a.logout).toLocaleString() : "Active";
+
+          activity.innerHTML += `
+            <div class="card">
+              <strong>Login:</strong> ${login}<br>
+              <strong>Logout:</strong> ${logout}
+            </div>`;
+        });
+    });
+}
+
+
+/* ---------- CREATE TICKET ---------- */
+createTicketBtn.onclick=()=>{
+  if(!ticketMobile.value||!ticketIssue.value) return;
+  ticketLoader.style.display="block";
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"createSupportTicket",
+      token,
+      data:{mobile:ticketMobile.value,issue:ticketIssue.value}
+    })
+  }).then(r=>r.json()).then(res=>{
+    ticketLoader.style.display="none";
+    if(res.success){
+      ticketMobile.value=ticketIssue.value="";
+      loadMyTickets();loadActivity();
+    }
+  });
+}
+
+/* ---------- MY TICKETS ---------- */
+function loadMyTickets(){
+  myTicketsLoader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"getSupportTickets",token})})
+  .then(r=>r.json()).then(res=>{
+    myTicketsLoader.style.display="none";
+    myTickets.innerHTML="";
+    if(!res.success) return;
+    res.data.sort((a,b)=>new Date(b[5])-new Date(a[5]))
+    .forEach(t=>{
+      myTickets.innerHTML+=`
+        <div class="card">
+          <strong>Ticket #${t[3]}</strong><br><br>
+          Issue: ${t[2]}<br><br>
+          Status: ${t[4]}<br><br>
+          Comments: ${t[7] || 'No comments'}<br><br>
+          Created At: ${new Date(t[5]).toLocaleString()}<br><br>
+          Closed At: ${t[6] ? new Date(t[6]).toLocaleString() : ""}
+        </div>`;
+    });
+  });
+}
+
+/* ---------- INIT ---------- */
+loadDashboard();
+loadReferrals();
+loadActivity();
+loadMyTickets();
+</script>
+
+</body>
+</html>

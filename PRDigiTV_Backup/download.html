@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Page iFrame with Logo</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            font-family: sans-serif;
+        }
+
+        /* Full-page iframe */
+        iframe {
+            border: none;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Logo container */
+        .logo {
+            position: fixed; /* stays on top */
+            top: 20px;       /* distance from top */
+            left: 20px;      /* distance from left */
+            z-index: 9999;   /* above iframe */
+            cursor: pointer;
+        }
+
+        .logo img {
+            width: 250px;    /* adjust size */
+            height: 105px;
+        }
+
+        /* Make logo smaller on mobile if needed */
+        @media (max-width: 600px) {
+            .logo img {
+                width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Clickable Logo -->
+    <a href="https://prdigitv.page.gd/" target="_blank" class="logo">
+        <img src="https://prdigitv.page.gd/logo.png" alt="PR Digi TV Logo">
+    </a>
+
+    <!-- Full-page iFrame -->
+    <iframe src="https://ibo.al/" allowfullscreen></iframe>
+</body>
+</html>

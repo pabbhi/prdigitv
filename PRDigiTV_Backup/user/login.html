@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="PR DigiTV Best IPTV Streaming">
+<meta property="og:description" content="PR DigiTV Best IPTV Streaming">
+<meta property="og:image" content="https://prdigitv.page.gd/logo.png">
+<meta property="og:url" content="https://prdigitv.page.gd/">
+    <link rel="icon" href="https://prdigitv.page.gd/logo.png" type="image/png">
+
+
+<title>PR DigiTV - Login / Register</title>
+<style>
+/* ====== GLOBAL STYLES ====== */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+header img {
+  max-width: 200px;
+  height: auto;
+}
+
+/* ====== CONTAINER ====== */
+.container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1000px;
+  background: #111;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 15px #0c0;
+}
+
+/* ====== COLUMNS ====== */
+.column {
+  flex: 1;
+  padding: 30px;
+  box-sizing: border-box;
+}
+.column:not(:last-child) {
+  border-right: 1px solid #0c0;
+}
+
+h2, h3 {
+  text-align: center;
+}
+h3 {
+  font-weight: normal;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* ====== FORM ELEMENTS ====== */
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: none;
+  box-sizing: border-box;
+}
+button {
+  background: #0c0;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #0a0;
+}
+
+/* ====== LOADER ====== */
+.loader {
+  border: 4px solid #222;
+  border-top: 4px solid #0c0;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 10px auto;
+  display: none;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ====== MESSAGE ====== */
+.msg {
+  color: #0c0;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ====== LOGO IMAGES ====== */
+.column img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 20px;
+}
+
+/* ====== RESPONSIVE STYLES ====== */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .column {
+    border-right: none !important;
+    border-bottom: 1px solid #0c0;
+  }
+  .column:last-child {
+    border-bottom: none;
+  }
+  h2, h3 {
+    font-size: 18px;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="https://prdigitv.page.gd/">
+    <img src="logo.png" alt="PR DigiTV" class="logo">
+  </a>
+    
+    
+</header>
+
+<div class="container">
+  <!-- Login Column -->
+  <div class="column">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <button id="sendOtpBtn">Send OTP</button>
+    <input type="text" id="otpInput" placeholder="Enter OTP" style="display:none">
+    <button id="verifyOtpBtn" style="display:none">Verify OTP</button>
+    <div class="loader" id="loginLoader"></div>
+    <p class="msg" id="loginMsg"></p>
+  </div>
+
+  <!-- Register / Enquiry Column -->
+  <div class="column">
+    <img src="trail.gif" alt="PR DigiTV" class="logo">
+    <h2>Request a Trial</h2>
+    <h3>By submitting this form you will get a free trial of 1 day. Enjoy global channels for 1 day.</h3>
+    <input type="text" id="regName" placeholder="Name">
+    <input type="text" id="regMobile" placeholder="Mobile">
+    <input type="email" id="regEmail" placeholder="Email">
+    <select id="deviceType">
+      <option value="Android TV">Android TV</option>
+      <option value="Android Mobile">Android Mobile</option>
+      <option value="iPhone">iPhone</option>
+      <option value="Samsung TV">Samsung TV</option>
+      <option value="Windows">Windows</option>
+      <option value="MacOS">MacOS</option>
+      <option value="Linux">Linux</option>
+    </select>
+    <button id="registerBtn">Submit</button>
+    <div class="loader" id="regLoader"></div>
+    <p class="msg" id="regMsg"></p>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwVUcZNKmVgoTPX1qbWY4BxMBtQFxAq9WiR8qKO3YV9gFe-O0ubQ65HxszbmFrLj7ygmg/exec";
+
+/* ================= LOGIN ================= */
+const loginLoader=document.getElementById("loginLoader");
+const loginMsg=document.getElementById("loginMsg");
+const sendOtpBtn=document.getElementById("sendOtpBtn");
+const verifyOtpBtn=document.getElementById("verifyOtpBtn");
+const otpInput=document.getElementById("otpInput");
+
+sendOtpBtn.onclick=()=>{
+  const email=document.getElementById("loginEmail").value.trim();
+  if(!email){loginMsg.textContent="Enter email"; return;}
+  loginLoader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"sendOtp",email})})
+    .then(res=>res.json()).then(res=>{
+      loginLoader.style.display="none";
+      if(res.success){
+        loginMsg.textContent="OTP sent. Check your email";
+        otpInput.style.display="block";
+        verifyOtpBtn.style.display="block";
+      } else loginMsg.textContent=res.msg;
+    }).catch(err=>{
+      loginLoader.style.display="none";
+      loginMsg.textContent="Network error";
+    });
+};
+
+verifyOtpBtn.onclick=()=>{
+  const email=document.getElementById("loginEmail").value.trim();
+  const otp=otpInput.value.trim();
+  if(!otp){loginMsg.textContent="Enter OTP"; return;}
+  loginLoader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"verifyOtp",email,otp})})
+    .then(res=>res.json()).then(res=>{
+      loginLoader.style.display="none";
+      if(res.success){
+        localStorage.setItem("token",res.data.token);
+        localStorage.setItem("email",email);
+        window.location.href="user.html";
+      } else loginMsg.textContent=res.msg;
+    }).catch(err=>{
+      loginLoader.style.display="none";
+      loginMsg.textContent="Network error";
+    });
+};
+
+/* ================= REGISTER / ENQUIRY ================= */
+const regLoader=document.getElementById("regLoader");
+const regMsg=document.getElementById("regMsg");
+document.getElementById("registerBtn").onclick=()=>{
+  const name=document.getElementById("regName").value.trim();
+  const mobile=document.getElementById("regMobile").value.trim();
+  const email=document.getElementById("regEmail").value.trim();
+  const device=document.getElementById("deviceType").value;
+  if(!name||!mobile||!email){regMsg.textContent="Fill all fields"; return;}
+  regLoader.style.display="block";
+  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action:"saveEnquiry",data:{name,mobile,email,device}})})
+    .then(res=>res.json()).then(res=>{
+      regLoader.style.display="none";
+      regMsg.textContent=res.success?"Enquiry submitted":"Error: "+res.msg;
+      if(res.success){
+        document.getElementById("regName").value="";
+        document.getElementById("regMobile").value="";
+        document.getElementById("regEmail").value="";
+        document.getElementById("deviceType").value="Android TV";
+      }
+    }).catch(err=>{
+      regLoader.style.display="none";
+      regMsg.textContent="Network error";
+    });
+};
+</script>
+</body>
+</html>

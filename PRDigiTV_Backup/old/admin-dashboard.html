@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRDigiTV Admin Dashboard</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  height: 100vh;
+  width: 220px;
+  background: #333;
+  color: white;
+  padding-top: 20px;
+  flex-shrink: 0;
+}
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.logo {
+  width: 220px; /* Adjust as needed */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 5px; /* optional */
+}
+.sidebar a {
+  display: block;
+  color: white;
+  padding: 12px 15px;
+  text-decoration: none;
+  font-size: 16px;
+  transition: 0.2s;
+  text-align: center;       /* Center the text */
+  width: auto;              /* Make width fit content */
+  margin: 0 auto; 
+}
+.sidebar a:hover { background: #444; }
+
+/* Header */
+header {
+  position: fixed;
+  top: 0;
+  left: 220px;
+  right: 0;
+  height: 50px;
+  background: #222;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 20px;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+.logout-btn {
+  padding: 3px 8px;
+  background: #e74c3c;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+/* Content */
+.content {
+  margin-left: 20px;
+  padding: 70px 20px 20px 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tab {
+  width: 100%;
+  max-width: 1200px;
+  background: white;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  border-radius: 5px;
+}
+.hidden { display: none; }
+input, select, button { padding: 5px; margin: 5px 0; width: 95%; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { border: 1px solid #ccc; padding: 5px; text-align: left; }
+th { background: #eee; }
+h3 { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo-container">
+    <img src="https://prdigitv.page.gd/logo.png" alt="PRDigiTV Logo" class="logo">
+  </div>
+  <a href="#" onclick="showTab('addUser')">Add User</a>
+  <a href="#" onclick="showTab('addAdmin')">Add Admin</a>
+  <a href="#" onclick="showTab('userAccount')">User Account</a>
+  <a href="#" onclick="showTab('viewUsers')">All Users</a>
+  <a href="#" onclick="showTab('viewAdmins')">All Admins</a>
+  <a href="#" onclick="showTab('viewEnquiry')">Enquiry</a>
+  <a href="#" onclick="showTab('viewReferrals')">Referrals</a>
+  <a href="#" onclick="showTab('viewLogs')">Logs</a>
+  <a href="#" onclick="showTab('viewUserDetails')">User Details</a>
+  <a href="#" onclick="showTab('viewUserDashboard')">User Dashboard</a>
+</div>
+
+<header>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+<div class="content">
+
+  <!-- Add User -->
+  <div id="addUser" class="tab hidden">
+    <h3>Add User</h3>
+    <input type="email" id="uEmail" placeholder="Email">
+    <input type="text" id="uName" placeholder="Name">
+    <input type="text" id="uMobile" placeholder="Mobile">
+    <button onclick="addUser()">Submit</button>
+    <p id="msgUser"></p>
+  </div>
+
+  <!-- Add Admin -->
+  <div id="addAdmin" class="tab hidden">
+    <h3>Add Admin</h3>
+    <input type="email" id="aEmail" placeholder="Email">
+    <input type="text" id="aName" placeholder="Name">
+    <select id="aRole">
+      <option value="ADMIN">ADMIN</option>
+      <option value="SUPER_ADMIN">SUPER_ADMIN</option>
+    </select>
+    <button onclick="addAdmin()">Submit</button>
+    <p id="msgAdmin"></p>
+  </div>
+
+  <!-- User Account -->
+  <div id="userAccount" class="tab hidden">
+    <h3>Create / Update User Account</h3>
+    <input type="email" id="uaEmail" placeholder="Email">
+    <input type="text" id="uaPlaylist" placeholder="Playlist Name">
+    <input type="date" id="uaActivated" placeholder="Playlist Activated Date">
+    <input type="date" id="uaExpiry" placeholder="Playlist Expiry Date">
+    <input type="number" id="uaAmount" placeholder="Amount Paid">
+    <input type="text" id="uaPortalLink" placeholder="Portal Link">
+    <input type="text" id="uaPortalUser" placeholder="Portal User Name">
+    <input type="text" id="uaPortalPass" placeholder="Portal Password">
+    <input type="text" id="uaIPTV" placeholder="IPTV Player Name">
+    <button onclick="submitUserAccount()">Submit</button>
+    <p id="msgUserAccount"></p>
+  </div>
+
+  <!-- View Tabs -->
+  <div id="viewUsers" class="tab hidden"><h3>All Users</h3><div id="tblUsers"></div></div>
+  <div id="viewAdmins" class="tab hidden"><h3>All Admins</h3><div id="tblAdmins"></div></div>
+  <div id="viewEnquiry" class="tab hidden"><h3>All Enquiries</h3><div id="tblEnquiry"></div></div>
+  <div id="viewReferrals" class="tab hidden"><h3>All Referrals</h3><div id="tblReferrals"></div></div>
+  <div id="viewLogs" class="tab hidden"><h3>Logs</h3><div id="tblLogs"></div></div>
+  <div id="viewUserDetails" class="tab hidden"><h3>User Details</h3><div id="tblUserDetails"></div></div>
+  <div id="viewUserDashboard" class="tab hidden"><h3>User Dashboard</h3><div id="tblUserDashboard"></div></div>
+
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzxIw-9x3A3DKMQl3ApTAgN-AneHALTQ69DObLJ-wttUHHKPuBnKW2sIPPMlySVaIHyhw/exec"; 
+const TOKEN = "PRDIGITV_SECRET_23022020"; 
+
+function showTab(tabId) {
+  const tabs = document.getElementsByClassName("tab");
+  for (let t of tabs) t.classList.add("hidden");
+  document.getElementById(tabId).classList.remove("hidden");
+}
+
+// --------- API CALLS ---------
+function addUser() {
+  const Email = document.getElementById("uEmail").value.trim().toLowerCase();
+  const Name = document.getElementById("uName").value;
+  const Mobile = document.getElementById("uMobile").value;
+  if (!Email || !Name || !Mobile) { alert("Please fill all fields"); return; }
+
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "addUser", token: TOKEN, Email, Name, Mobile })
+  })
+  .then(r => r.json())
+  .then(res => {
+    document.getElementById("msgUser").innerText = res.status==="ok"?"User Added!":res.msg;
+    if(res.status==="ok"){
+      document.getElementById("uEmail").value="";
+      document.getElementById("uName").value="";
+      document.getElementById("uMobile").value="";
+    }
+  });
+}
+
+function addAdmin() {
+  const Email = document.getElementById("aEmail").value.trim().toLowerCase();
+  const Name = document.getElementById("aName").value;
+  const Role = document.getElementById("aRole").value;
+  if (!Email || !Name) { alert("Please fill all fields"); return; }
+
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "addAdmin", token: TOKEN, Email, Name, Role })
+  })
+  .then(r => r.json())
+  .then(res => {
+    document.getElementById("msgAdmin").innerText = res.status==="ok"?"Admin Added!":res.msg;
+    if(res.status==="ok"){
+      document.getElementById("aEmail").value="";
+      document.getElementById("aName").value="";
+      document.getElementById("aRole").value="ADMIN";
+    }
+  });
+}
+
+function submitUserAccount() {
+  const params = {
+    Email: document.getElementById("uaEmail").value.trim().toLowerCase(),
+    "Playlist Name": document.getElementById("uaPlaylist").value,
+    "Playlist Activated Date": document.getElementById("uaActivated").value,
+    "Playlist Expiry Date": document.getElementById("uaExpiry").value,
+    "Amount Paid": document.getElementById("uaAmount").value,
+    "Portal Link": document.getElementById("uaPortalLink").value,
+    "Portal User Name": document.getElementById("uaPortalUser").value,
+    "Portal Password": document.getElementById("uaPortalPass").value,
+    "IPTV Player Name": document.getElementById("uaIPTV").value
+  };
+  if(!params.Email || !params["Playlist Name"]){ alert("Please fill required fields"); return; }
+
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "createOrUpdateUserAccount", token: TOKEN, ...params })
+  })
+  .then(r => r.json())
+  .then(res => {
+    document.getElementById("msgUserAccount").innerText = res.status==="ok"?"User Account Updated!":res.msg;
+    if(res.status==="ok"){
+      for(let id of ["uaEmail","uaPlaylist","uaActivated","uaExpiry","uaAmount","uaPortalLink","uaPortalUser","uaPortalPass","uaIPTV"]){
+        document.getElementById(id).value="";
+      }
+    }
+  });
+}
+
+// --------- FETCH DATA ---------
+function fetchSheet(action, divId){
+  fetch(API_URL, {
+    method:"POST",
+    body: JSON.stringify({ action, token: TOKEN })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if(res.status==="ok"){
+      let html="<table><tr>";
+      if(res.data.length>0){
+        const firstRow = res.data.find(row=>Object.values(row).some(v=>v!=="" && v!==null));
+        if(!firstRow){ document.getElementById(divId).innerHTML="No Data"; return; }
+        for(const k in firstRow) html+="<th>"+k+"</th>";
+        html+="</tr>";
+        res.data.forEach(row=>{
+          if(Object.values(row).every(v=>v=="" || v==null)) return;
+          html+="<tr>";
+          for(const k in row) html+="<td>"+row[k]+"</td>";
+          html+="</tr>";
+        });
+      } else html+="<tr><td>No Data</td></tr>";
+      html+="</table>";
+      document.getElementById(divId).innerHTML=html;
+    }
+  });
+}
+
+// Load all tables on page load
+window.onload = function(){
+  const tabs = {
+    "tblUsers":"fetchUsers",
+    "tblAdmins":"fetchAdmins",
+    "tblEnquiry":"fetchEnquiry",
+    "tblReferrals":"fetchReferrals",
+    "tblLogs":"fetchLogs",
+    "tblUserDetails":"fetchUserDetails",
+    "tblUserDashboard":"fetchUserDashboard"
+  };
+  for(const divId in tabs) fetchSheet(tabs[divId], divId);
+}
+
+// Logout placeholder
+function logout(){ alert("Implement logout logic here!"); }
+</script>
+
+</body>
+</html>

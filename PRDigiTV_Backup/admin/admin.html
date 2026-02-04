@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+<style>
+body{font-family:Arial;max-width:1200px;margin:auto;}
+.logo{text-align:center;margin:20px}
+.tab{display:inline-block;padding:10px;border:1px solid #ccc;cursor:pointer;margin-right:2px;}
+.tab.active{background:#007bff;color:#fff;}
+.tab-content{display:none;padding:10px;border:1px solid #ccc;margin-top:5px;}
+.tab-content.active{display:block;}
+input,button,select{padding:8px;margin:4px 0;width:100%;box-sizing:border-box;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border:1px solid #ccc;padding:5px;text-align:left;}
+</style>
+</head>
+<body>
+<div class="logo">
+  <img src="https://prdigitv.page.gd/logo.png" width="220" style="height:auto;">
+</div>
+<h2>Admin Dashboard</h2>
+<button onclick="logout()">Logout</button>
+
+<!-- Tabs -->
+<div id="tabs">
+  <span class="tab active" onclick="showTab(0)">Create User</span>
+  <span class="tab" onclick="showTab(1)">Create Admin</span>
+  <span class="tab" onclick="showTab(2)">User Account</span>
+  <span class="tab" onclick="showTab(3)">Users</span>
+  <span class="tab" onclick="showTab(4)">Admins</span>
+  <span class="tab" onclick="showTab(5)">Enquiries</span>
+  <span class="tab" onclick="showTab(6)">Referrals</span>
+  <span class="tab" onclick="showTab(7)">Logs</span>
+  <span class="tab" onclick="showTab(8)">User Details</span>
+  <span class="tab" onclick="showTab(9)">User Dashboard</span>
+</div>
+
+<!-- Tab Contents -->
+<div id="contents">
+  <!-- 1. Create User -->
+  <div class="tab-content active" id="c0">
+    <h3>Create User</h3>
+    <input type="email" id="cu_email" placeholder="Email" required>
+    <input type="text" id="cu_name" placeholder="Name" required>
+    <input type="text" id="cu_mobile" placeholder="Mobile" maxlength="10" required>
+    <select id="cu_country"></select>
+    <button onclick="createUser()">Create User</button>
+  </div>
+
+  <!-- 2. Create Admin -->
+  <div class="tab-content" id="c1">
+    <h3>Create Admin</h3>
+    <input type="email" id="ca_email" placeholder="Email" required>
+    <input type="text" id="ca_name" placeholder="Name" required>
+    <select id="ca_role">
+      <option value="Admin">Admin</option>
+      <option value="SuperAdmin">SuperAdmin</option>
+    </select>
+    <button onclick="createAdmin()">Create Admin</button>
+  </div>
+
+  <!-- 3. User Account -->
+  <div class="tab-content" id="c2">
+    <h3>User Account</h3>
+    <select id="ua_email_select" onchange="loadUserAccount()"><option value="">Select Email</option></select>
+    <input type="text" id="ua_playlist" placeholder="Playlist Name" required>
+    <input type="date" id="ua_activated" placeholder="Activated Date" required>
+    <input type="date" id="ua_expiry" placeholder="Expiry Date" required>
+    <input type="number" id="ua_amount" placeholder="Amount Paid" required>
+    <input type="text" id="ua_portal_link" placeholder="Portal Link" required>
+    <input type="text" id="ua_portal_user" placeholder="Portal Username" required>
+    <input type="text" id="ua_portal_pass" placeholder="Portal Password" required>
+    <input type="text" id="ua_iptv" placeholder="IPTV Player Name" required>
+    <button onclick="createUpdateDelete('create')">Create</button>
+    <button onclick="createUpdateDelete('update')">Update</button>
+    <button onclick="createUpdateDelete('delete')">Delete</button>
+  </div>
+
+  <!-- 4. Users Table -->
+  <div class="tab-content" id="c3">
+    <h3>Users</h3>
+    <div id="users_table"></div>
+  </div>
+
+  <!-- 5. Admins Table -->
+  <div class="tab-content" id="c4">
+    <h3>Admins</h3>
+    <div id="admins_table"></div>
+  </div>
+
+  <!-- 6. Enquiries Table -->
+  <div class="tab-content" id="c5">
+    <h3>Enquiries</h3>
+    <div id="enquiries_table"></div>
+  </div>
+
+  <!-- 7. Referrals Table -->
+  <div class="tab-content" id="c6">
+    <h3>Referrals</h3>
+    <div id="referrals_table"></div>
+  </div>
+
+  <!-- 8. Logs Table -->
+  <div class="tab-content" id="c7">
+    <h3>Logs</h3>
+    <div id="logs_table"></div>
+  </div>
+
+  <!-- 9. User Details Table -->
+  <div class="tab-content" id="c8">
+    <h3>User Details</h3>
+    <div id="userdetails_table"></div>
+  </div>
+
+  <!-- 10. User Dashboard Table -->
+  <div class="tab-content" id="c9">
+    <h3>User Dashboard Data</h3>
+    <div id="userdashboard_table"></div>
+  </div>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbxlR66vro_cyZh-g2PzogZKXtdSSAYxcv628UxLvIDOt2bhxkaYgz-bvOyM4-AU3VUI/exec";
+const token = localStorage.getItem("sessionToken");
+
+// --- Tabs ---
+function showTab(i){
+  document.querySelectorAll(".tab").forEach((t,n)=>t.classList.toggle("active",i==n));
+  document.querySelectorAll(".tab-content").forEach((c,n)=>c.classList.toggle("active",i==n));
+}
+
+// --- Country Dropdown ---
+const countries = [
+  {name:"India",code:"+91"}, {name:"USA",code:"+1"}, {name:"UK",code:"+44"}, {name:"Australia",code:"+61"}
+];
+function loadCountries(){
+  const sel = document.getElementById("cu_country");
+  countries.forEach(c=>{
+    let opt = document.createElement("option");
+    opt.value=c.code; opt.text=c.name + " " + c.code;
+    sel.appendChild(opt);
+  });
+}
+
+// --- Logout ---
+function logout(){
+  fetch(API,{method:"POST",body:JSON.stringify({action:"logout",token}),headers:{"Content-Type":"application/json"}})
+  .finally(()=>{localStorage.clear();location.href="index.html";});
+}
+let idleTimer;["mousemove","keydown","click"].forEach(e=>document.addEventListener(e,()=>{clearTimeout(idleTimer);idleTimer=setTimeout(logout,20*60*1000);}));
+window.addEventListener("beforeunload",logout);
+
+// --- Load Tables ---
+function loadTable(sheet,div){
+  fetch(API,{method:"POST",body:JSON.stringify({action:"getData",sheet}),headers:{"Content-Type":"application/json"}})
+  .then(r=>r.json()).then(r=>{
+    if(!r.success){document.getElementById(div).innerHTML="Error"; return;}
+    const data = r.data;
+    if(!data.length){document.getElementById(div).innerHTML="No data"; return;}
+    let h="<table><tr>";
+    Object.keys(data[0]).forEach(k=>h+="<th>"+k+"</th>");
+    h+="<th>Action</th></tr>";
+    data.forEach(row=>{
+      h+="<tr>";
+      Object.values(row).forEach(v=>h+="<td>"+v+"</td>");
+      h+="<td><button onclick='editRow("+JSON.stringify(row)+")'>Edit</button> <button onclick='deleteRow("+JSON.stringify(row)+",\""+sheet+"\")'>Delete</button></td></tr>";
+    });
+    h+="</table>";
+    document.getElementById(div).innerHTML=h;
+    if(sheet=="Users") populateUserSelect(data);
+  });
+}
+
+// --- Populate User Select ---
+function populateUserSelect(users){
+  const sel = document.getElementById("ua_email_select");
+  sel.innerHTML="<option value=''>Select Email</option>";
+  users.forEach(u=>{
+    let opt = document.createElement("option");
+    opt.value = u.Email;
+    opt.text = u.Email;
+    sel.appendChild(opt);
+  });
+}
+
+// --- Edit / Delete functions ---
+function editRow(row){
+  if(confirm("Edit this record?")){
+    Object.keys(row).forEach(k=>{
+      const el = document.getElementById("ua_"+k.toLowerCase());
+      if(el) el.value = row[k];
+    });
+  }
+}
+function deleteRow(row,sheet){
+  if(confirm("Delete this record?")){
+    fetch(API,{method:"POST",body:JSON.stringify({action:"getData",sheet})}).then(r=>r.json())
+  }
+}
+
+// --- Create User ---
+function createUser(){
+  const email=document.getElementById("cu_email").value;
+  const name=document.getElementById("cu_name").value;
+  const mobile=document.getElementById("cu_mobile").value;
+  const country=document.getElementById("cu_country").value;
+  if(!email || !name || !mobile || !country){alert("All fields required"); return;}
+  if(!/^\d{10}$/.test(mobile)){alert("Mobile must be 10 digits"); return;}
+  fetch(API,{method:"POST",body:JSON.stringify({action:"addRow",sheet:"Users",data:[email,name,country+mobile,"AdminCreated","",""]}),headers:{"Content-Type":"application/json"}})
+  .then(()=>{alert("User created"); loadTable("Users","users_table");});
+}
+
+// --- Create Admin ---
+function createAdmin(){
+  const email=document.getElementById("ca_email").value;
+  const name=document.getElementById("ca_name").value;
+  const role=document.getElementById("ca_role").value;
+  if(!email||!name||!role){alert("All fields required");return;}
+  fetch(API,{method:"POST",body:JSON.stringify({action:"addRow",sheet:"Admins",data:[email,name,role,"","","",""]}),headers:{"Content-Type":"application/json"}})
+  .then(()=>{alert("Admin created"); loadTable("Admins","admins_table");});
+}
+
+// --- Load User Account for update ---
+function loadUserAccount(){
+  const email=document.getElementById("ua_email_select").value;
+  if(!email) return;
+  fetch(API,{method:"POST",body:JSON.stringify({action:"getData",sheet:"UserAccount"}),headers:{"Content-Type":"application/json"}})
+  .then(r=>r.json()).then(r=>{
+    if(!r.success) return;
+    const row = r.data.find(x=>x.Email==email);
+    if(!row) return;
+    document.getElementById("ua_playlist").value=row["Playlist Name"];
+    document.getElementById("ua_activated").value=row["Playlist Activated Date"];
+    document.getElementById("ua_expiry").value=row["Playlist Expiry Date"];
+    document.getElementById("ua_amount").value=row["Amount Paid"];
+    document.getElementById("ua_portal_link").value=row["Portal Link"];
+    document.getElementById("ua_portal_user").value=row["Portal User Name"];
+    document.getElementById("ua_portal_pass").value=row["Portal Password"];
+    document.getElementById("ua_iptv").value=row["IPTV Player Name"];
+  });
+}
+
+// --- Create / Update / Delete User Account ---
+function createUpdateDelete(action){
+  if(!confirm(`Are you sure you want to ${action}?`)) return;
+  const email=document.getElementById("ua_email_select").value;
+  if(!email && action!="create"){alert("Select email"); return;}
+  const row=[
+    email,
+    document.getElementById("ua_playlist").value,
+    document.getElementById("ua_activated").value,
+    document.getElementById("ua_expiry").value,
+    document.getElementById("ua_amount").value,
+    document.getElementById("ua_portal_link").value,
+    document.getElementById("ua_portal_user").value,
+    document.getElementById("ua_portal_pass").value,
+    document.getElementById("ua_iptv").value
+  ];
+  fetch(API,{method:"POST",body:JSON.stringify({action:"addRow",sheet:"UserAccount",data:row}),headers:{"Content-Type":"application/json"}})
+  .then(()=>{alert(action+" done"); loadTable("UserAccount","userdashboard_table");});
+}
+
+// --- Initialize ---
+loadCountries();
+loadTable("Users","users_table");
+loadTable("Admins","admins_table");
+loadTable("Enquiry","enquiries_table");
+loadTable("UserReferral","referrals_table");
+loadTable("Logs","logs_table");
+loadTable("UserDetails","userdetails_table");
+loadTable("UserDashboard","userdashboard_table");
+
+</script>
+</body>
+</html>
