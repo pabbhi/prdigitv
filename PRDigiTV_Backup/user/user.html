@@ -385,11 +385,13 @@ function loadActivity() {
         .forEach(a => {
           let login = a.login ? new Date(a.login).toLocaleString() : "";
           let logout = a.logout ? new Date(a.logout).toLocaleString() : "Active";
+          let duration = a["Session Duration"] || "-";
 
           activity.innerHTML += `
             <div class="card">
               <strong>Login:</strong> ${login}<br>
               <strong>Logout:</strong> ${logout}
+              <strong>Duration:</strong> ${duration}
             </div>`;
         });
     });
