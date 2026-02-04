@@ -380,18 +380,32 @@ function loadActivity() {
       activity.innerHTML = "";
       if (!res.success) return;
 
-      res.data
-        .sort((a, b) => new Date(b.login) - new Date(a.login))
-        .forEach(a => {
-          let login = a.login ? new Date(a.login).toLocaleString() : "";
-          let logout = a.logout ? new Date(a.logout).toLocaleString() : "Active";
-          let duration = a["Session Duration"] || "-";
+res.data
+  .sort((a, b) => new Date(b["Login Time"]) - new Date(a["Login Time"]))
+  .forEach(a => {
+    // Format login time
+    let login = a["Login Time"] 
+      ? new Date(a["Login Time"]).toLocaleString() 
+      : "";
 
-          activity.innerHTML += `
-            <div class="card">
-              <strong>Login:</strong> ${login}<br>
-              <strong>Logout:</strong> ${logout}
-              <strong>Duration:</strong> ${duration}
+    // Format logout time or show "Active"
+    let logout = a["Logout Time"] 
+      ? new Date(a["Logout Time"]).toLocaleString() 
+      : "Active";
+
+    // Get session duration, fallback to "-"
+    let duration = a["Session Duration"] || "-";
+
+    // Append the card to the activity container
+    activity.innerHTML += `
+      <div class="card">
+        <strong>Login:</strong> ${login}<br>
+        <strong>Logout:</strong> ${logout}<br>
+        <strong>Duration:</strong> ${duration}
+      </div>
+    `;
+  });
+
             </div>`;
         });
     });
