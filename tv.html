@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal HLS Player</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #video-container {
+      position: relative;
+      width: 90%;
+      max-width: 1000px;
+      aspect-ratio: 16 / 9;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      background-color: black;
+    }
+
+    #fullscreen-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #fullscreen-btn:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="video-container">
+    <video id="hls-player" controls></video>
+    <button id="fullscreen-btn">Fullscreen</button>
+  </div>
+
+  <!-- Include hls.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    const video = document.getElementById('hls-player');
+    const playlistUrl = 'https://pabbhi.github.io/prdigitv/tv1.m3u'; // Replace with .m3u8 or .m3u URL
+
+    function isHLS(url) {
+      // Simple check: ends with .m3u8 or .m3u
+      return url.endsWith('.m3u8') || url.endsWith('.m3u');
+    }
+
+    if (!isHLS(playlistUrl)) {
+      alert('The provided file is not a supported HLS playlist (.m3u8 or .m3u).');
+    } else if (Hls.isSupported()) {
+      const hls = new Hls({ capLevelToPlayerSize: true });
+      hls.loadSource(playlistUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        video.play();
+      });
+
+      hls.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
+        console.log('Switched to quality level:', data.level);
+      });
+
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari native support
+      video.src = playlistUrl;
+      video.addEventListener('loadedmetadata', function() {
+        video.play();
+      });
+    } else {
+      alert('Your browser does not support HLS streaming.');
+    }
+
+    // Fullscreen button functionality
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    fullscreenBtn.addEventListener('click', () => {
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if (video.webkitRequestFullscreen) { // Safari
+        video.webkitRequestFullscreen();
+      } else if (video.msRequestFullscreen) { // IE11
+        video.msRequestFullscreen();
+      }
+    });
+  </script>
+
+</body>
+</html>
