@@ -123,21 +123,29 @@ function loadFiles(e){
   }
 }
 
-// --- Parse M3U playlist ---
+// --- Parse M3U playlist with dynamic category detection ---
 function parseM3U(data){
   let info = {}
+  const keywords = ["News","Movies","Entertainment","Sports","Kids","Music","Religion","Lifestyle","Education","Documentary","Cooking","Science","Travel","Local"]
+
   data.split("\n").forEach(line => {
     line = line.trim()
     if(line.startsWith("#EXTINF")){
-      info = {
-        name: line.split(",")[1] || "Unknown",
-        logo: (line.match(/tvg-logo="(.*?)"/) || [])[1],
-        group: (line.match(/group-title="(.*?)"/) || [])[1] || "Other"
+      const name = line.split(",")[1] || "Unknown"
+      const logo = (line.match(/tvg-logo="(.*?)"/) || [])[1] || ""
+      let group = (line.match(/group-title="(.*?)"/) || [])[1]
+      
+      // If no group-title, detect category from name keywords
+      if(!group){
+        group = keywords.find(k => name.toLowerCase().includes(k.toLowerCase())) || "Other"
       }
+
+      info = {name, logo, group}
     } else if(line.startsWith("http")){
       channels.push({...info, url: line})
     }
   })
+
   renderCategories()
   renderChannels()
   current = null
@@ -148,7 +156,7 @@ function parseM3U(data){
 // --- Render categories ---
 function renderCategories(){
   const cat = document.getElementById("category")
-  const cats = [...new Set(channels.map(c => c.group))]
+  const cats = [...new Set(channels.map(c => c.group))].sort()
   cat.innerHTML = `<option value="">All</option><option value="FAV">⭐ Favorites</option>`
   cats.forEach(c => cat.innerHTML += `<option>${c}</option>`)
 }
