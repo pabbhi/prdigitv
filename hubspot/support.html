@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Support Dashboard</title>
 <style>
-body{font-family:Arial;background:#f4f6f8;margin:0;padding:0;}
+body{font-family:Arial;margin:0;padding:0;background:#f4f6f8;}
 .sidebar{width:220px;background:#1f2937;color:white;height:100vh;position:fixed;top:0;left:0;padding-top:20px;}
 .sidebar a{display:block;color:white;padding:15px 20px;text-decoration:none;}
 .sidebar a:hover{background:#374151;}
@@ -23,8 +23,6 @@ button.logout:hover{background:#dc2626;}
 .modal-content button:hover{background:#4f46e5;}
 .close{position:absolute;top:10px;right:10px;cursor:pointer;font-weight:bold;}
 .message{color:green;margin-top:5px;}
-.chatBtn{background:#10b981;color:white;padding:5px 8px;border:none;border-radius:4px;cursor:pointer;}
-.chatBtn:hover{background:#059669;}
 </style>
 </head>
 <body>
@@ -41,6 +39,7 @@ button.logout:hover{background:#dc2626;}
 <button class="logout" id="topLogoutBtn">Logout</button>
 </header>
 
+<!-- Dashboard Section -->
 <div id="dashboardSection" class="dashboard">
   <div class="card">Total Leads: <span id="totalLeads">0</span></div>
   <div class="card">New Leads: <span id="newLeads">0</span></div>
@@ -48,15 +47,14 @@ button.logout:hover{background:#dc2626;}
   <div class="card">Closed: <span id="closedLeads">0</span></div>
 </div>
 
-<div class="tab">
-  <button class="active" id="leadsTabBtn">Leads</button>
-</div>
-
 <!-- Leads Section -->
-<div id="leadsSection" style="display:none">
+<div id="leadsSection" style="display:none;">
   <table class="leads-table" id="leadsTable">
     <thead>
-      <tr><th>ID</th><th>Name</th><th>Email</th><th>Business</th><th>Budget</th><th>Status</th><th>Owner</th><th>Date</th><th>Notes</th><th>Chat</th></tr>
+      <tr>
+        <th>ID</th><th>Name</th><th>Email</th><th>Business</th><th>Budget</th>
+        <th>Status</th><th>Owner</th><th>Date</th><th>Notes</th><th>Chat</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -77,7 +75,6 @@ button.logout:hover{background:#dc2626;}
       <option>Contacted</option>
       <option>Closed</option>
     </select>
-    <select id="leadOwner"></select>
     <input type="datetime-local" id="leadDate">
     <textarea id="leadNotes" placeholder="Notes"></textarea>
     <button id="saveLeadBtn">Save</button>
@@ -86,38 +83,56 @@ button.logout:hover{background:#dc2626;}
 </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbxqWX4PHkkUjsBo5seEy87Hk_xxaeGEXDg7roqpU1SfGhah-PbWuYMp32G8H-ZVTMjsiA/exec"; // Replace with Apps Script URL
+// === CONFIG ===
+const API="https://script.google.com/macros/s/AKfycbzerzKY4Vkf5rTgzQpLJGgovg_xwWN2slxvVKiUUekzllahn1wpc3Vj042hWQbcd8dzMQ/exec"; // Apps Script URL
+const currentUserEmail=localStorage.getItem('email'); // logged-in support
 let users=[];
-const currentUserEmail = localStorage.getItem('email'); // Logged in support user
 
-// Logout
-document.getElementById('logoutBtn').onclick = document.getElementById('topLogoutBtn').onclick = () => {
-  localStorage.clear(); window.location='index.html';
+// === LOGOUT ===
+document.getElementById('logoutBtn').onclick=document.getElementById('topLogoutBtn').onclick=()=>{
+  localStorage.clear();
+  window.location='index.html';
 };
 
-// Tabs toggle
-const leadsTabBtn=document.getElementById('leadsTabBtn');
-const leadsSection=document.getElementById('leadsSection');
-leadsTabBtn.onclick=()=>{leadsSection.style.display='block'; document.getElementById('dashboardSection').style.display='none'; loadLeads(); }
+// === DASHBOARD CLICK ===
+document.getElementById('dashboardLink').onclick=()=>{
+  document.getElementById('dashboardSection').style.display='flex';
+  document.getElementById('leadsSection').style.display='none';
+};
 
-// Fetch users for dropdown
+// === LEADS CLICK ===
+document.getElementById('leadsLink').onclick=()=>{
+  document.getElementById('dashboardSection').style.display='none';
+  document.getElementById('leadsSection').style.display='block';
+};
+
+// === FETCH USERS ===
 fetch(API,{method:'POST',body:new URLSearchParams({action:'getUsers'})})
-.then(res=>res.json()).then(data=>{ 
-  users=data; 
-  const leadOwnerSelect=document.getElementById('leadOwner'); 
-  users.forEach(u=>{ const opt=document.createElement('option'); opt.value=u.email; opt.innerText=u.name; leadOwnerSelect.appendChild(opt);});
-});
+.then(res=>res.json()).then(data=>{users=data;});
 
-// Fetch Leads assigned to this support user
+// === LOAD LEADS ===
 function loadLeads(){
   fetch(API,{method:'POST',body:new URLSearchParams({action:'getLeads'})})
   .then(res=>res.json()).then(data=>{
-    const tbody=document.querySelector('#leadsTable tbody'); tbody.innerHTML=''; 
+    const tbody=document.querySelector('#leadsTable tbody');
+    tbody.innerHTML='';
     let total=0,newL=0,contacted=0,closed=0;
     data.slice(1).filter(r=>r[6]===currentUserEmail).forEach(r=>{
-      total++; if(r[5]=='New Lead') newL++; else if(r[5]=='Contacted') contacted++; else if(r[5]=='Closed') closed++;
+      total++;
+      if(r[5]=='New Lead') newL++;
+      else if(r[5]=='Contacted') contacted++;
+      else if(r[5]=='Closed') closed++;
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${r[0]}</td><td class="clickable">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${new Date(r[7]).toLocaleString()}</td><td>${r[8]}</td><td><button class="chatBtn" onclick="window.open('${r[9]}')">Chat</button></td>`;
+      tr.innerHTML=`<td>${r[0]}</td>
+        <td class="clickable">${r[1]}</td>
+        <td>${r[2]}</td>
+        <td>${r[3]}</td>
+        <td>${r[4]}</td>
+        <td>${r[5]}</td>
+        <td>${r[6]}</td>
+        <td>${new Date(r[7]).toLocaleString()}</td>
+        <td>${r[8]}</td>
+        <td><a href="${r[9]}" target="_blank">Open Chat</a></td>`;
       tr.querySelector('.clickable').onclick=()=>openLeadModal(r);
       tbody.appendChild(tr);
     });
@@ -127,10 +142,12 @@ function loadLeads(){
     document.getElementById('closedLeads').innerText=closed;
   });
 }
+loadLeads();
 
-// Lead modal
+// === LEAD MODAL ===
 const leadModal=document.getElementById('leadModal');
-document.getElementById('closeLeadModal').onclick=()=>leadModal.style.display='none';
+const closeLeadModal=document.getElementById('closeLeadModal');
+closeLeadModal.onclick=()=>leadModal.style.display='none';
 function openLeadModal(row){
   leadModal.style.display='flex';
   document.getElementById('leadId').value=row[0];
@@ -139,25 +156,29 @@ function openLeadModal(row){
   document.getElementById('leadBusiness').value=row[3];
   document.getElementById('leadBudget').value=row[4];
   document.getElementById('leadStatus').value=row[5];
-  document.getElementById('leadOwner').value=row[6];
   document.getElementById('leadDate').value=new Date(row[7]).toISOString().slice(0,16);
   document.getElementById('leadNotes').value=row[8];
 }
 
-// Save lead
+// === SAVE LEAD ===
 document.getElementById('saveLeadBtn').onclick=()=>{
-  const obj={ id: document.getElementById('leadId').value, name: document.getElementById('leadName').value,
-    email: document.getElementById('leadEmail').value, business: document.getElementById('leadBusiness').value,
-    budget: document.getElementById('leadBudget').value, status: document.getElementById('leadStatus').value,
-    owner: document.getElementById('leadOwner').value, date: document.getElementById('leadDate').value,
-    notes: document.getElementById('leadNotes').value };
+  const obj={
+    id: document.getElementById('leadId').value,
+    name: document.getElementById('leadName').value,
+    email: document.getElementById('leadEmail').value,
+    business: document.getElementById('leadBusiness').value,
+    budget: document.getElementById('leadBudget').value,
+    status: document.getElementById('leadStatus').value,
+    date: document.getElementById('leadDate').value,
+    notes: document.getElementById('leadNotes').value
+  };
   fetch(API,{method:'POST',body:new URLSearchParams({action:'updateLead', data:JSON.stringify(obj)})})
-  .then(res=>res.json()).then(()=>{ document.getElementById('leadMsg').innerText="Lead updated!"; loadLeads(); setTimeout(()=>{leadModal.style.display='none';document.getElementById('leadMsg').innerText='';},1000);});
+  .then(res=>res.json()).then(()=>{
+    document.getElementById('leadMsg').innerText="Lead updated!";
+    loadLeads();
+    setTimeout(()=>{leadModal.style.display='none';document.getElementById('leadMsg').innerText='';},1000);
+  });
 };
-
-// Show dashboard by default
-document.addEventListener('DOMContentLoaded', ()=>{ document.getElementById('dashboardSection').style.display='flex'; });
 </script>
-
 </body>
 </html>

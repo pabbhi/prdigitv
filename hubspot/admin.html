@@ -4,9 +4,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard</title>
 <style>
-body{font-family:Arial;background:#f4f6f8;margin:0;padding:0;}
+body{font-family:Arial;margin:0;padding:0;background:#f4f6f8;}
 .sidebar{width:220px;background:#1f2937;color:white;height:100vh;position:fixed;top:0;left:0;padding-top:20px;}
-.sidebar a{display:block;color:white;padding:15px 20px;text-decoration:none;cursor:pointer;}
+.sidebar a{display:block;color:white;padding:15px 20px;text-decoration:none;}
 .sidebar a:hover{background:#374151;}
 .sidebar .submenu{display:none;background:#374151;margin-left:10px;}
 .sidebar .submenu a{padding-left:30px;}
@@ -33,14 +33,14 @@ button.logout:hover{background:#dc2626;}
 <body>
 
 <div class="sidebar">
-  <a id="dashboardLink">Dashboard</a>
-  <a id="leadsLink">Leads</a>
-  <a id="contactsLink">Contacts &#9662;</a>
+  <a href="#" id="dashboardLink">Dashboard</a>
+  <a href="#" id="leadsLink">Leads</a>
+  <a href="#" id="contactsLink">Contacts</a>
   <div class="submenu" id="contactsSubmenu">
-    <a id="createContactLink">Create Contact</a>
-    <a id="importContactLink">Import Contacts</a>
+    <a href="#" id="createContactLink">Create Contact</a>
+    <a href="#" id="importContactLink">Import Contacts</a>
   </div>
-  <a class="logout" id="logoutBtn">Logout</a>
+  <a href="#" class="logout" id="logoutBtn">Logout</a>
 </div>
 
 <div class="main">
@@ -49,7 +49,7 @@ button.logout:hover{background:#dc2626;}
 <button class="logout" id="topLogoutBtn">Logout</button>
 </header>
 
-<!-- Dashboard -->
+<!-- Dashboard Section -->
 <div id="dashboardSection" class="dashboard">
   <div class="card">Total Leads: <span id="totalLeads">0</span></div>
   <div class="card">New Leads: <span id="newLeads">0</span></div>
@@ -64,17 +64,21 @@ button.logout:hover{background:#dc2626;}
 </div>
 
 <!-- Leads Section -->
-<div id="leadsSection" style="display:none">
+<div id="leadsSection" style="display:none;">
   <table class="leads-table" id="leadsTable">
     <thead>
-      <tr><th>ID</th><th>Name</th><th>Email</th><th>Business</th><th>Budget</th><th>Status</th><th>Owner</th><th>Date</th><th>Notes</th></tr>
+      <tr>
+        <th>ID</th><th>Name</th><th>Email</th><th>Business</th><th>Budget</th>
+        <th>Status</th><th>Owner</th><th>Date</th><th>Notes</th><th>Chat</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
 </div>
 
 <!-- Contacts Section -->
-<div id="contactsSection" style="display:none">
+<div id="contactsSection" style="display:none;">
+  <!-- Create Contact Form -->
   <div id="createContactForm" style="display:none;">
     <h3>Create Contact</h3>
     <input type="text" id="contactName" placeholder="Name">
@@ -85,8 +89,10 @@ button.logout:hover{background:#dc2626;}
     <button id="saveContactBtn">Save Contact</button>
     <p class="message" id="contactMsg"></p>
   </div>
+
+  <!-- Import Contacts Form -->
   <div id="importContactForm" style="display:none;">
-    <h3>Import Contacts (CSV, XLS, XLSX)</h3>
+    <h3>Import Contacts (CSV/XLS/XLSX)</h3>
     <input type="file" id="contactsFile">
     <button id="importContactsBtn">Upload</button>
     <p class="message" id="importMsg"></p>
@@ -117,25 +123,17 @@ button.logout:hover{background:#dc2626;}
 </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbxqWX4PHkkUjsBo5seEy87Hk_xxaeGEXDg7roqpU1SfGhah-PbWuYMp32G8H-ZVTMjsiA/exec"; // replace with your Apps Script URL
+// === CONFIG ===
+const API="https://script.google.com/macros/s/AKfycbzerzKY4Vkf5rTgzQpLJGgovg_xwWN2slxvVKiUUekzllahn1wpc3Vj042hWQbcd8dzMQ/exec"; // Apps Script URL
 let users=[];
 
-// Logout
-document.getElementById('logoutBtn').onclick = document.getElementById('topLogoutBtn').onclick = () => {
+// === LOGOUT ===
+document.getElementById('logoutBtn').onclick=document.getElementById('topLogoutBtn').onclick=()=>{
   localStorage.clear();
   window.location='index.html';
 };
 
-// Sidebar submenu click toggle
-const contactsLink = document.getElementById('contactsLink');
-const contactsSubmenu = document.getElementById('contactsSubmenu');
-contactsSubmenu.style.display='none';
-contactsLink.onclick = (e)=>{
-  e.preventDefault();
-  contactsSubmenu.style.display = contactsSubmenu.style.display==='block'?'none':'block';
-};
-
-// Tabs toggle
+// === TAB NAVIGATION ===
 const leadsTabBtn=document.getElementById('leadsTabBtn');
 const contactsTabBtn=document.getElementById('contactsTabBtn');
 const leadsSection=document.getElementById('leadsSection');
@@ -153,7 +151,11 @@ contactsTabBtn.onclick=()=>{
   leadsTabBtn.classList.remove('active');
 };
 
-// Fetch users for dropdowns
+// === SHOW CONTACTS SUBMENU ===
+document.getElementById('contactsLink').onmouseover=()=>document.getElementById('contactsSubmenu').style.display='block';
+document.getElementById('contactsLink').onmouseout=()=>document.getElementById('contactsSubmenu').style.display='none';
+
+// === FETCH USERS FOR DROPDOWN ===
 fetch(API,{method:'POST',body:new URLSearchParams({action:'getUsers'})})
 .then(res=>res.json()).then(data=>{
   users=data;
@@ -165,7 +167,7 @@ fetch(API,{method:'POST',body:new URLSearchParams({action:'getUsers'})})
   });
 });
 
-// Load leads
+// === LOAD LEADS ===
 function loadLeads(){
   fetch(API,{method:'POST',body:new URLSearchParams({action:'getLeads'})})
   .then(res=>res.json()).then(data=>{
@@ -178,7 +180,16 @@ function loadLeads(){
       else if(r[5]=='Contacted') contacted++;
       else if(r[5]=='Closed') closed++;
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${r[0]}</td><td class="clickable">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${new Date(r[7]).toLocaleString()}</td><td>${r[8]}</td>`;
+      tr.innerHTML=`<td>${r[0]}</td>
+        <td class="clickable">${r[1]}</td>
+        <td>${r[2]}</td>
+        <td>${r[3]}</td>
+        <td>${r[4]}</td>
+        <td>${r[5]}</td>
+        <td>${r[6]}</td>
+        <td>${new Date(r[7]).toLocaleString()}</td>
+        <td>${r[8]}</td>
+        <td><a href="${r[9]}" target="_blank">Open Chat</a></td>`;
       tr.querySelector('.clickable').onclick=()=>openLeadModal(r);
       tbody.appendChild(tr);
     });
@@ -190,7 +201,7 @@ function loadLeads(){
 }
 loadLeads();
 
-// Lead modal
+// === LEAD MODAL ===
 const leadModal=document.getElementById('leadModal');
 const closeLeadModal=document.getElementById('closeLeadModal');
 closeLeadModal.onclick=()=>leadModal.style.display='none';
@@ -207,7 +218,7 @@ function openLeadModal(row){
   document.getElementById('leadNotes').value=row[8];
 }
 
-// Save lead
+// === SAVE LEAD ===
 document.getElementById('saveLeadBtn').onclick=()=>{
   const obj={
     id: document.getElementById('leadId').value,
@@ -221,28 +232,18 @@ document.getElementById('saveLeadBtn').onclick=()=>{
     notes: document.getElementById('leadNotes').value
   };
   fetch(API,{method:'POST',body:new URLSearchParams({action:'updateLead', data:JSON.stringify(obj)})})
-  .then(res=>res.json()).then(data=>{
+  .then(res=>res.json()).then(()=>{
     document.getElementById('leadMsg').innerText="Lead updated!";
     loadLeads();
     setTimeout(()=>{leadModal.style.display='none';document.getElementById('leadMsg').innerText='';},1000);
   });
 };
 
-// Create Contact form
+// === CREATE CONTACT FORM ===
 document.getElementById('createContactLink').onclick=()=>{
   document.getElementById('createContactForm').style.display='block';
   document.getElementById('importContactForm').style.display='none';
-  contactsTabBtn.click();
 };
-
-// Import Contact form
-document.getElementById('importContactLink').onclick=()=>{
-  document.getElementById('createContactForm').style.display='none';
-  document.getElementById('importContactForm').style.display='block';
-  contactsTabBtn.click();
-};
-
-// Save Contact
 document.getElementById('saveContactBtn').onclick=()=>{
   const params={
     name:document.getElementById('contactName').value,
@@ -262,7 +263,28 @@ document.getElementById('saveContactBtn').onclick=()=>{
     setTimeout(()=>{document.getElementById('contactMsg').innerText='';},2000);
   });
 };
-</script>
 
+// === IMPORT CONTACTS FORM ===
+document.getElementById('importContactLink').onclick=()=>{
+  document.getElementById('createContactForm').style.display='none';
+  document.getElementById('importContactForm').style.display='block';
+};
+document.getElementById('importContactsBtn').onclick=()=>{
+  const file=document.getElementById('contactsFile').files[0];
+  if(!file){alert("Select a file"); return;}
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    const lines=e.target.result.split("\n");
+    const arr=[];
+    for(let i=1;i<lines.length;i++){
+      const cols=lines[i].split(",");
+      if(cols.length>=4) arr.push({name:cols[0],email:cols[1],business:cols[2],budget:cols[3],owner:users[0].email});
+    }
+    fetch(API,{method:'POST',body:new URLSearchParams({action:'bulkUploadLeads',data:JSON.stringify(arr)})})
+    .then(res=>res.json()).then(()=>{document.getElementById('importMsg').innerText="Imported!"; loadLeads();});
+  };
+  reader.readAsText(file);
+};
+</script>
 </body>
 </html>
