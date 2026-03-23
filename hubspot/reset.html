@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Password</title>
+<style>
+body{font-family:Arial;background:#f4f6f8;display:flex;justify-content:center;align-items:center;height:100vh;}
+form{background:white;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);width:300px;}
+input{width:100%;padding:8px;margin:10px 0;border-radius:4px;border:1px solid #ccc;}
+button{width:100%;padding:10px;background:#6366f1;color:white;border:none;border-radius:4px;cursor:pointer;}
+button:hover{background:#4f46e5;}
+.message{color:green;margin-top:5px;text-align:center;}
+</style>
+</head>
+<body>
+<form id="resetForm">
+<h3>Reset Password</h3>
+<input type="email" id="email" placeholder="Email" required>
+<input type="text" id="token" placeholder="Reset Token" required>
+<input type="password" id="newPassword" placeholder="New Password" required>
+<button type="submit">Reset Password</button>
+<p class="message" id="msg"></p>
+</form>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbxqWX4PHkkUjsBo5seEy87Hk_xxaeGEXDg7roqpU1SfGhah-PbWuYMp32G8H-ZVTMjsiA/exec";
+
+document.getElementById('resetForm').onsubmit = function(e){
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const token = document.getElementById('token').value;
+  const password = document.getElementById('newPassword').value;
+
+  fetch(API,{
+    method:'POST',
+    body:new URLSearchParams({action:'resetPassword', email:email, token:token, password:password})
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    document.getElementById('msg').innerText = data.msg;
+    if(data.status==="success") setTimeout(()=>window.location='index.html',2000);
+  });
+};
+</script>
+</body>
+</html>

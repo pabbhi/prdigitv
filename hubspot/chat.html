@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support Chat</title>
+<style>
+body{font-family:Arial;height:100vh;margin:0;display:flex;flex-direction:column;background:#f4f6f8;}
+#messages{flex:1;overflow:auto;padding:10px;background:white;margin:10px;border-radius:8px;}
+#messages div{margin:5px 0;padding:5px;border-radius:5px;}
+.user{background:#e0f7fa;text-align:right;}
+.support{background:#d1c4e9;text-align:left;}
+#inputBox{display:flex;border-top:1px solid #ccc;}
+#messageInput{flex:1;padding:10px;border:none;border-radius:0;}
+#sendBtn{padding:10px;background:#6366f1;color:white;border:none;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div id="messages"></div>
+<div id="inputBox">
+  <input type="text" id="messageInput" placeholder="Type your message...">
+  <button id="sendBtn">Send</button>
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbxqWX4PHkkUjsBo5seEy87Hk_xxaeGEXDg7roqpU1SfGhah-PbWuYMp32G8H-ZVTMjsiA/exec"; // Replace with deployed Apps Script URL
+const urlParams=new URLSearchParams(window.location.search);
+const leadId=urlParams.get("leadId");
+const token=urlParams.get("token");
+const chatLink="chat_"+leadId;
+let sender = prompt("Enter your name/email:");
+
+// Display all messages
+function loadMessages(){
+  fetch(API,{method:'POST',body:new URLSearchParams({action:'getChatMessages', chatLink:chatLink})})
+  .then(res=>res.json())
+  .then(data=>{
+    const div=document.getElementById('messages');
+    div.innerHTML="";
+    data.forEach(m=>{
+      const msgDiv=document.createElement('div');
+      msgDiv.className = (m.sender===sender)?'user':'support';
+      msgDiv.innerHTML=`<b>${m.sender}:</b> ${m.message}`;
+      div.appendChild(msgDiv);
+    });
+    div.scrollTop = div.scrollHeight;
+  });
+}
+
+// Send new message
+document.getElementById('sendBtn').onclick=function(){
+  const message=document.getElementById('messageInput').value;
+  if(!message) return;
+  fetch(API,{method:'POST',body:new URLSearchParams({action:'saveChatMessage', chatLink:chatLink, sender:sender, message:message})})
+    .then(res=>res.json()).then(()=> {
+      document.getElementById('messageInput').value="";
+      loadMessages();
+    });
+};
+
+setInterval(loadMessages,2000);
+loadMessages();
+</script>
+</body>
+</html>
